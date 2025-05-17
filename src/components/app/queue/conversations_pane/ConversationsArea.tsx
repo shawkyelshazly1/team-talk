@@ -2,10 +2,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import ActiveConversationsContainer from "./ActiveConversationsContainer";
 import PendingConversationsContainer from "./PendingConversationsContainer";
+import { Suspense } from "react";
 
 export default function ConversationsArea() {
 	return (
-		<div className="min-h-screen flex-1 py-4 border-r border-border w-1/2 lg:w-1/3 px-1">
+		<div className="h-[100vh] flex-1 py-4 border-r border-border w-1/2 lg:w-1/3 px-1">
 			<Tabs defaultValue="active_conversations" className="w-full">
 				<TabsList className="w-full ">
 					<TabsTrigger
@@ -26,10 +27,14 @@ export default function ConversationsArea() {
 					</TabsTrigger>
 				</TabsList>
 				<TabsContent value="active_conversations">
-					<ActiveConversationsContainer />
+					<Suspense fallback={<h1>loading</h1>}>
+						<ActiveConversationsContainer />
+					</Suspense>
 				</TabsContent>
 				<TabsContent value="pending_conversations">
-					<PendingConversationsContainer />
+					<Suspense fallback={<h1>loading</h1>}>
+						<PendingConversationsContainer />
+					</Suspense>
 				</TabsContent>
 			</Tabs>
 		</div>

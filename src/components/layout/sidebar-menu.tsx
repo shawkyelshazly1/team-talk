@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { Inbox, MessagesSquare } from "lucide-react";
+import { Inbox, MessagesSquare, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-// Menu items.
-const items = [
+import { useSession } from "@/lib/auh/auth-client";
+import Loading from "@/app/app/loading";
+import { ClipLoader } from "react-spinners";
+
+// Team_lead Menu items.
+const team_lead_menu_items = [
 	{
 		title: "Queue",
 		url: "/app",
@@ -18,11 +22,35 @@ const items = [
 		icon: MessagesSquare,
 	},
 ];
+
+// CSR Menu items.
+const csr_menu_items = [
+	{
+		title: "Inbox",
+		url: "/app/inbox",
+		icon: Inbox,
+	},
+	{
+		title: "Search",
+		url: "/app/search",
+		icon: Search,
+	},
+];
 export default function SidebarMenuLinks() {
+	const { data: session, isPending } = useSession();
 	const pathname = usePathname();
+	const menu_items =
+		session?.user.role === "csr" ? csr_menu_items : team_lead_menu_items;
+
+	if (isPending)
+		return (
+			<div className="flex items-center justify-center h-full">
+				<ClipLoader className="mx-auto" size={20} />;
+			</div>
+		);
 	return (
 		<SidebarMenu>
-			{items.map((item) => (
+			{menu_items.map((item) => (
 				<SidebarMenuItem key={item.title}>
 					<SidebarMenuButton
 						disabled={pathname === item.url}

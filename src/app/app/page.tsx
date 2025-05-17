@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/auh/auth-utils";
-import ConversationsArea from "@/components/app/conversations_pane/ConversationsArea";
-import ChatSection from "@/components/app/chate_pane/ChatSection";
+import ConversationsArea from "@/components/app/queue/conversations_pane/ConversationsArea";
+import ChatSection from "@/components/app/queue/chate_pane/ChatSection";
 export default async function AppPage() {
 	await requireAuth();
 
