@@ -35,7 +35,8 @@ export type Agent = User & {
 export type Message = {
     id: string;
     content: string;
-    createdAt: string;
+    createdAt?: string;
+    updatedAt?: string;
     sender: Agent | TeamLeader;
     conversationId: string;
     isRead: boolean;
