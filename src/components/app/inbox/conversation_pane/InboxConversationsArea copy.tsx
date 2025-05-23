@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 import InboxActiveConversationsContainer from "./InboxActiveConversationsContainer";
 import InboxClosedConversationsContainer from "./InboxClosedConversationsContainer";
+import { Button } from "@/components/ui/button";
 import NewConversationModal from "./NewConversationModal";
-import InboxPendingConversationsContainer from "./InboxPendingConversationsContainer";
 
 export default function InboxConversationsArea() {
 	return (

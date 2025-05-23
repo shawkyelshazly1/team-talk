@@ -1,6 +1,6 @@
 "use client";
 // import { increment } from "@/app/stores/features/counter/counterSlice";
-import { RootState } from "@/app/stores/store";
+import { RootState } from "@/stores/store";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function TestButton() {

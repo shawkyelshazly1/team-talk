@@ -8,27 +8,27 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export default function SearchConversationsInput() {
-	const [search, setSearch] = useState("");
+	const [searchQuery, setSearchQuery] = useState("");
 	const searchRef = useRef<HTMLInputElement>(null);
 	const searchParams = useSearchParams();
 
 	useEffect(() => {
-		const search = searchParams.get("search");
+		const query = searchParams.get("query");
 
-		if (search) {
-			setSearch(search);
+		if (query) {
+			setSearchQuery(query);
 		} else {
-			setSearch("");
+			setSearchQuery("");
 		}
 	}, [searchParams]);
 
 	function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
 		if (e.key === "Enter") {
 			const searchParams = new URLSearchParams(window.location.search);
-			if (search) {
-				searchParams.set("search", search);
+			if (searchQuery) {
+				searchParams.set("query", searchQuery);
 			} else {
-				searchParams.delete("search");
+				searchParams.delete("query");
 			}
 			const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
 			window.history.pushState({}, "", newUrl);
@@ -47,8 +47,8 @@ export default function SearchConversationsInput() {
 			</Button>
 			<Input
 				ref={searchRef}
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
+				value={searchQuery}
+				onChange={(e) => setSearchQuery(e.target.value)}
 				onKeyDown={handleKeyDown}
 				placeholder="Search in conversations"
 				className="w-full focus-visible:border-0 focus-visible:ring-0 border-0 ring-0 outline-none shadow-none "
@@ -57,12 +57,12 @@ export default function SearchConversationsInput() {
 				variant="outline"
 				className={cn(
 					"p-0 rounded-full bg-transparent outline-0 border-0 ring-0 ring-offset-0 cursor-pointer m-0 hover:bg-muted-foreground/10 hidden",
-					search.length > 0 && "inline-block"
+					searchQuery.length > 0 && "inline-block"
 				)}
 				onClick={() => {
-					setSearch("");
+					setSearchQuery("");
 					const searchParams = new URLSearchParams(window.location.search);
-					searchParams.delete("search");
+					searchParams.delete("query");
 					const newUrl = `${
 						window.location.pathname
 					}?${searchParams.toString()}`;

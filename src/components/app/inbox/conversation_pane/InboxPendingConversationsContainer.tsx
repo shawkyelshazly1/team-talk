@@ -3,9 +3,10 @@ import InboxConversationCard from "./InboxConversationCard";
 import { useLoadCsrConversations } from "@/services/queries/conversation";
 import { SyncLoader } from "react-spinners";
 
-export default function InboxClosedConversationsContainer() {
-	const { data: closedConversations, isLoading } =
-		useLoadCsrConversations("closed");
+export default function InboxPendingConversationsContainer() {
+	const { data: pendingConversations, isLoading } =
+		useLoadCsrConversations("pending");
+
 	return (
 		<div className="flex flex-col gap-2 overflow-y-auto h-[86vh] pt-4 px-2">
 			{isLoading ? (
@@ -13,7 +14,7 @@ export default function InboxClosedConversationsContainer() {
 					<SyncLoader color="#000" />
 				</div>
 			) : (
-				closedConversations?.map((conversation) => (
+				pendingConversations?.map((conversation) => (
 					<InboxConversationCard
 						key={conversation.id}
 						conversation={conversation}

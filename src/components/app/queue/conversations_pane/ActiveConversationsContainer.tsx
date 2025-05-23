@@ -1,8 +1,11 @@
-import { conversationsMockData } from "@/lib/mockData";
+"use client";
 import ConversationCard from "./ConversationCard";
+import { selectBasket } from "@/stores/features/user/userSlice";
+import { useSelector } from "react-redux";
 
 export default function ActiveConversationsContainer() {
-	let activeConversations = conversationsMockData
+	const basket = useSelector(selectBasket);
+	let activeConversations = basket
 		// TODO: Remove this filter once we have the real data only active conversations are fetched
 		.filter((conversation) => conversation.status === "active")
 		.sort((a, b) => {
@@ -22,6 +25,9 @@ export default function ActiveConversationsContainer() {
 		});
 	return (
 		<div className="flex flex-col gap-2 overflow-y-auto h-[92vh] pt-4 px-2">
+			<h1 className="text-lg font-medium mx-auto">
+				No Assigned Active Conversations
+			</h1>
 			{activeConversations.map((conversation) => (
 				<ConversationCard key={conversation.id} conversation={conversation} />
 			))}

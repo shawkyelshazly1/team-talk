@@ -17,30 +17,52 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { useLoadConversations } from "@/services/queries/conversation";
+import { useSearchParams } from "next/navigation";
+import { SyncLoader } from "react-spinners";
+import { columns } from "@/components/app/conversations/conversations_table/columns";
 
-interface DataTableProps<TData, TValue> {
-	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
-}
+export function ConversationsTable() {
+	const [pagination, setPagination] = useState({
+		pageIndex: 0, //initial page index
+		pageSize: 10, //default page size
+	});
+	const searchParams = useSearchParams();
 
-export function DataTable<TData, TValue>({
-	columns,
-	data,
-}: DataTableProps<TData, TValue>) {
+	const {
+		data: conversations,
+		isLoading,
+		isRefetching,
+		refetch,
+	} = useLoadConversations({
+		agents: searchParams.get("agents") ?? "",
+		teamLeaders: searchParams.get("teamLeaders") ?? "",
+		take: pagination.pageSize,
+		skip: pagination.pageIndex * pagination.pageSize,
+	});
+
+	useEffect(() => {
+		refetch();
+	}, [searchParams, pagination]);
+
 	const table = useReactTable({
-		data,
+		data: conversations ?? [],
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		initialState: {
-			pagination: {
-				pageSize: 12,
-				pageIndex: 0,
-			},
+		manualPagination: true,
+		state: {
+			pagination,
 		},
+		onPaginationChange: setPagination,
 	});
 
-	return (
+	return isLoading || isRefetching ? (
+		<div className="flex justify-center items-center h-full">
+			<SyncLoader color="#000" />
+		</div>
+	) : (
 		<div className="flex flex-col h-[85vh] gap-2">
 			<div className="rounded-md border overflow-y-auto h-[72vh]">
 				<Table>

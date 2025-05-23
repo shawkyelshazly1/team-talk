@@ -9,7 +9,7 @@ export type Conversation = {
     lastMessage?: Message;
     unreadMessagesCount?: number;
     updatedAt: string;
-
+    assignee?: TeamLeader;
 };
 
 export type ConversationSearchResults = Omit<Conversation, 'teamLeaders' | 'status' | 'topic'> & {
@@ -20,12 +20,13 @@ export type User = {
     id: string;
     name: string;
     email: string;
-    image: string;
+    image?: string | null | undefined;
     role: "team_lead" | "csr";
 };
 
 export type TeamLeader = User & {
     role: "team_lead";
+    assignedConversations?: Conversation[];
 };
 
 export type Agent = User & {
@@ -37,7 +38,7 @@ export type Message = {
     content: string;
     createdAt?: string;
     updatedAt?: string;
-    sender: Agent | TeamLeader;
+    sender: Agent | TeamLeader | User;
     conversationId: string;
     isRead: boolean;
 };
@@ -47,7 +48,7 @@ export type UserEvent = {
     createdAt: string;
     type: "user_status_change";
     user: TeamLeader;
-    status: "online" | "offline";
+    status: UserStatus;
 };
 
 export type ConversationEvent = {
@@ -57,6 +58,8 @@ export type ConversationEvent = {
     conversation: Conversation;
     status?: "pending" | "active" | "closed";
 };
+
+export type UserStatus = "online" | "offline";
 
 
 

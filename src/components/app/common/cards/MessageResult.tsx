@@ -12,7 +12,7 @@ export default function MessageResult({
 }) {
 	const [isExpanded, setIsExpanded] = useState(!(message.content.length > 100));
 	const searchParams = useSearchParams();
-	const searchTerm = searchParams.get("search");
+	const searchTerm = searchParams.get("query");
 	return (
 		<span className="text-sm text-gray-500">
 			{!isExpanded ? (

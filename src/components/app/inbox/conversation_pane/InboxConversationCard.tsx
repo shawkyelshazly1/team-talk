@@ -3,18 +3,18 @@ import UserInfoAvatar from "../../common/cards/UserInfoAvatar";
 import { Conversation } from "@/lib/types";
 import moment from "moment";
 import { getUser } from "@/lib/auh/auth-utils";
+import { useSession } from "@/lib/auh/auth-client";
 
-export default async function InboxConversationCard({
+export default function InboxConversationCard({
 	conversation,
 }: {
 	conversation: Omit<Conversation, "teamLeaders" | "topic">;
 }) {
-	const user = await getUser();
+	const { data: session } = useSession();
 	return (
 		<div className="flex flex-col gap-3">
 			<div className="flex  flex-col gap-2 justify-between p-2 md:p-4 bg-card rounded-xl border shadow-sm hover:bg-accent/50 cursor-pointer transition-colors">
-				<div className="flex flex-row justify-between w-full">
-					<UserInfoAvatar user={conversation.agent} />
+				<div className="flex flex-row w-fit ml-auto">
 					<p className="text-xs text-muted-foreground">
 						{moment(conversation.lastMessage?.createdAt).calendar(null, {
 							sameDay: "h:mm A",
@@ -25,9 +25,9 @@ export default async function InboxConversationCard({
 					</p>
 				</div>
 				<div className="flex flex-row justify-between">
-					<p className="text-xs text-muted-foreground line-clamp-2 ">
+					<p className="text-sm text-muted-foreground line-clamp-2 ">
 						<span className="font-semibold text-foreground">
-							{user?.id === conversation.lastMessage?.sender.id
+							{session?.user?.id === conversation.lastMessage?.sender.id
 								? "You: "
 								: conversation.lastMessage?.sender.name + ": "}
 						</span>

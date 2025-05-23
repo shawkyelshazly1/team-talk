@@ -26,7 +26,7 @@ export const columns: ColumnDef<Conversation>[] = [
 			return (
 				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
 					<Avatar className="w-8 h-8 ring-2 ring-blue-300">
-						<AvatarImage src={row.original.agent.image} />
+						<AvatarImage src={row.original.agent.image ?? ""} />
 						<AvatarFallback className="bg-blue-300 text-white capitalize">
 							{row.original.agent.name.charAt(0) +
 								row.original.agent.name.charAt(1)}
@@ -39,14 +39,37 @@ export const columns: ColumnDef<Conversation>[] = [
 		accessorKey: "agent",
 	},
 	{
+		header: () => <div className="text-center">Assignee</div>,
+		cell: ({ row }) => {
+			return row.original.assignee ? (
+				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
+					<Avatar className="w-8 h-8 ring-2 ring-blue-300">
+						<AvatarImage src={row.original.assignee?.image ?? ""} />
+						<AvatarFallback className="bg-blue-300 text-white capitalize">
+							{row.original.assignee?.name?.charAt(0) +
+								row.original.assignee?.name?.charAt(1)}
+						</AvatarFallback>
+					</Avatar>
+					<p className="text-sm">{row.original.agent.email}</p>
+				</div>
+			) : (
+				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
+					<p className="text-sm">-</p>
+				</div>
+			);
+		},
+		accessorKey: "assignee",
+	},
+	{
 		header: () => <div className="text-center">Team Leaders</div>,
 		cell: ({ row }) => {
 			return (
 				<HoverCard>
 					<HoverCardTrigger className="flex flex-row items-center justify-center border-b-[1px] border-blue-500 w-fit mx-auto pb-1 border-dashed">
-						{row.original.teamLeaders.length > 4 ? (
+						{row.original.teamLeaders?.length &&
+						row.original.teamLeaders.length > 4 ? (
 							<>
-								{row.original.teamLeaders.slice(0, 3).map((tl, idx) => (
+								{row.original.teamLeaders?.slice(0, 3).map((tl, idx) => (
 									<Avatar
 										key={tl.id}
 										className={cn(
@@ -54,7 +77,7 @@ export const columns: ColumnDef<Conversation>[] = [
 											idx == 0 ? "ml-0" : "-ml-1"
 										)}
 									>
-										<AvatarImage src={tl.image} />
+										<AvatarImage src={tl?.image ?? ""} />
 										<AvatarFallback className="bg-blue-500 text-white capitalize">
 											{tl.name.charAt(0) + tl.name.charAt(1)}
 										</AvatarFallback>
@@ -65,7 +88,7 @@ export const columns: ColumnDef<Conversation>[] = [
 								</span>
 							</>
 						) : (
-							row.original.teamLeaders.map((tl, idx) => (
+							row.original.teamLeaders?.map((tl, idx) => (
 								<Avatar
 									key={tl.id}
 									className={cn(
@@ -73,7 +96,7 @@ export const columns: ColumnDef<Conversation>[] = [
 										idx == 0 ? "ml-0" : "-ml-1"
 									)}
 								>
-									<AvatarImage src={tl.image} />
+									<AvatarImage src={tl?.image ?? ""} />
 									<AvatarFallback className="bg-blue-300 text-white capitalize">
 										{tl.name.charAt(0) + tl.name.charAt(1)}
 									</AvatarFallback>
@@ -82,10 +105,10 @@ export const columns: ColumnDef<Conversation>[] = [
 						)}
 					</HoverCardTrigger>
 					<HoverCardContent className="w-fit flex flex-col gap-2 max-h-[250px] overflow-y-auto">
-						{row.original.teamLeaders.map((tl) => (
+						{row.original.teamLeaders?.map((tl) => (
 							<div key={tl.id} className="flex flex-row items-center gap-2">
 								<Avatar>
-									<AvatarImage src={tl.image} />
+									<AvatarImage src={tl?.image ?? ""} />
 									<AvatarFallback className="bg-blue-300 text-white capitalize">
 										{tl.name.charAt(0) + tl.name.charAt(1)}
 									</AvatarFallback>

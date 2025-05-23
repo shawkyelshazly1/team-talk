@@ -17,77 +17,25 @@ import { ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
-
-const teamLeaders = [
-	{
-		value: "teamleader1@gmail.com",
-		label: "Team Leader 1",
-	},
-	{
-		value: "teamleader2@gmail.com",
-		label: "Team Leader 2",
-	},
-	{
-		value: "teamleader3@gmail.com",
-		label: "Team Leader 3",
-	},
-	{
-		value: "teamleader4@gmail.com",
-		label: "Team Leader 4",
-	},
-	{
-		value: "teamleader5@gmail.com",
-		label: "Team Leader 5",
-	},
-	{
-		value: "teamleader6@gmail.com",
-		label: "Team Leader 6",
-	},
-	{
-		value: "teamleader7@gmail.com",
-		label: "Team Leader 7",
-	},
-	{
-		value: "teamleader8@gmail.com",
-		label: "Team Leader 8",
-	},
-	{
-		value: "teamleader9@gmail.com",
-		label: "Team Leader 9",
-	},
-	{
-		value: "teamleader10@gmail.com",
-		label: "Team Leader 10",
-	},
-	{
-		value: "teamleader11@gmail.com",
-		label: "Team Leader 11",
-	},
-	{
-		value: "teamleader12@gmail.com",
-		label: "Team Leader 12",
-	},
-	{
-		value: "teamleader13@gmail.com",
-		label: "Team Leader 13",
-	},
-	{
-		value: "teamleader14@gmail.com",
-		label: "Team Leader 14",
-	},
-	{
-		value: "teamleader15@gmail.com",
-		label: "Team Leader 15",
-	},
-];
+import { useLoadTeamleadersFilter } from "@/services/queries/filters";
 
 export default function TeamLeaderFilter() {
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState("");
 	const [selectedTeamLeaders, setSelectedTeamLeaders] = useState<string[]>([]);
-	const [sortedTeamLeaders, setSortedTeamLeaders] =
-		useState<{ value: string; label: string }[]>(teamLeaders);
+	const [sortedTeamLeaders, setSortedTeamLeaders] = useState<string[]>([]);
 	const searchParams = useSearchParams();
+
+	// load team leaders
+	const { data: teamLeaders, isLoading: teamLeadersLoading } =
+		useLoadTeamleadersFilter();
+
+	// handle team leaders data
+	useEffect(() => {
+		if (teamLeaders) {
+			setSortedTeamLeaders(teamLeaders);
+		}
+	}, [teamLeaders]);
 
 	useEffect(() => {
 		const teamLeaders = searchParams.get("teamLeaders");
@@ -99,6 +47,7 @@ export default function TeamLeaderFilter() {
 		}
 	}, [searchParams]);
 
+	// handle team leaders search params change
 	useEffect(() => {
 		if (!open) {
 			const searchParams = new URLSearchParams(window.location.search);
@@ -110,27 +59,31 @@ export default function TeamLeaderFilter() {
 			const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
 			window.history.pushState({}, "", newUrl);
 
-			const sortedTeamLeaders = [...teamLeaders].sort((a, b) => {
-				const aSelected = selectedTeamLeaders.includes(a.value);
-				const bSelected = selectedTeamLeaders.includes(b.value);
+			const sortedTeamLeaders = teamLeaders?.sort((a, b) => {
+				const aSelected = selectedTeamLeaders.includes(a);
+				const bSelected = selectedTeamLeaders.includes(b);
 				if (aSelected && !bSelected) return -1;
 				if (!aSelected && bSelected) return 1;
 				return 0;
 			});
 
-			setSortedTeamLeaders(sortedTeamLeaders);
+			setSortedTeamLeaders(sortedTeamLeaders ?? []);
 		}
 	}, [open]);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild className="cursor-pointer">
+			<PopoverTrigger
+				asChild
+				className="cursor-pointer"
+				disabled={teamLeadersLoading}
+			>
 				<Button
 					variant="outline"
 					role="combobox"
 					aria-expanded={open}
 					className={cn(
-						"w-[200px] justify-between ",
+						"w-fit min-w-[200px] justify-between ",
 						selectedTeamLeaders.length > 0 &&
 							"bg-black/80 text-white hover:bg-black/80 hover:text-white"
 					)}
@@ -138,14 +91,14 @@ export default function TeamLeaderFilter() {
 					{selectedTeamLeaders.length === 0
 						? "Select Team Leaders"
 						: selectedTeamLeaders.length === 1
-						? teamLeaders.find(
-								(teamLeader) => teamLeader.value === selectedTeamLeaders[0]
-						  )?.label
+						? teamLeaders?.find(
+								(teamLeader) => teamLeader === selectedTeamLeaders[0]
+						  )
 						: `${selectedTeamLeaders.length} TLs Selected`}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
+			<PopoverContent className="w-fit p-0">
 				<Command>
 					<CommandInput placeholder="Search Team Leaders..." />
 					<CommandList>
@@ -153,8 +106,8 @@ export default function TeamLeaderFilter() {
 						<CommandGroup>
 							{sortedTeamLeaders.map((teamLeader) => (
 								<CommandItem
-									key={teamLeader.value}
-									value={teamLeader.value}
+									key={teamLeader}
+									value={teamLeader}
 									onSelect={(currentValue) => {
 										setValue(currentValue === value ? "" : currentValue);
 										setSelectedTeamLeaders((prev) =>
@@ -168,12 +121,12 @@ export default function TeamLeaderFilter() {
 									<Check
 										className={cn(
 											"mr-2 h-4 w-4",
-											selectedTeamLeaders.includes(teamLeader.value)
+											selectedTeamLeaders.includes(teamLeader)
 												? "opacity-100"
 												: "opacity-0"
 										)}
 									/>
-									{teamLeader.label}
+									{teamLeader}
 								</CommandItem>
 							))}
 						</CommandGroup>

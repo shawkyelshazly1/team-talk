@@ -10,6 +10,7 @@ export default function ConversationsSearchResultCard({
 }: {
 	conversation: ConversationSearchResults;
 }) {
+	// TODO: add a link to the conversation
 	return (
 		<div
 			className="flex flex-col w-full gap-4 bg-white rounded-lg hover:bg-gray-200 p-4 cursor-pointer shadow-md"

@@ -1,25 +1,20 @@
-import { BadgeCheck, LogOut } from "lucide-react";
-import { Bell } from "lucide-react";
-import React from "react";
 import {
-	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuSeparator,
+	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { AvatarFallback, AvatarImage } from "../ui/avatar";
 import { SidebarFooter, SidebarMenuButton } from "../ui/sidebar";
-import {
-	DropdownMenuLabel,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { DropdownMenuLabel, DropdownMenuContent } from "../ui/dropdown-menu";
 import { Avatar } from "../ui/avatar";
 import { DropdownMenu } from "../ui/dropdown-menu";
 import { SidebarMenuItem } from "../ui/sidebar";
 import { SidebarMenu } from "../ui/sidebar";
 import { getUser } from "@/lib/auh/auth-utils";
-import { ChevronsUpDown, CreditCardIcon, Sparkles } from "lucide-react";
 import { SignOutButton } from "../auth/sign-out-button";
+import { ChevronsUpDown } from "lucide-react";
+import SidebarUserStatus from "./sidebar-userstatus";
+import SidebarStatusSelector from "./sidebar-statusselector";
 export default async function SidebarUserFooter() {
 	const user = await getUser();
 
@@ -37,10 +32,14 @@ export default async function SidebarUserFooter() {
 								size="lg"
 								className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
 							>
-								<Avatar className="h-8 w-8 rounded-lg">
-									<AvatarImage src={user.image ?? ""} alt={user.name} />
-									<AvatarFallback className="rounded-lg">CN</AvatarFallback>
-								</Avatar>
+								<div className="relative ">
+									<Avatar className="h-8 w-8 rounded-lg">
+										<AvatarImage src={user.image ?? ""} alt={user.name} />
+										<AvatarFallback className="rounded-lg">CN</AvatarFallback>
+									</Avatar>
+									{/* Status Indicator */}
+									{user?.role === "team_lead" && <SidebarUserStatus />}
+								</div>
 								<div className="grid flex-1 text-left text-sm leading-tight">
 									<span className="truncate font-semibold">{user.name}</span>
 									<span className="truncate text-xs">{user.email}</span>
@@ -68,6 +67,15 @@ export default async function SidebarUserFooter() {
 							</DropdownMenuLabel>
 
 							<DropdownMenuSeparator />
+
+							{user?.role === "team_lead" && (
+								<>
+									{/* Status Selector */}
+									<SidebarStatusSelector />
+									<DropdownMenuSeparator />
+								</>
+							)}
+
 							<DropdownMenuItem className="cursor-pointer hover:bg-sidebar-accent">
 								<SignOutButton />
 							</DropdownMenuItem>
