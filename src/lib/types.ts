@@ -4,12 +4,13 @@ export type Conversation = {
     createdAt: string;
     status: "pending" | "active" | "closed";
     teamLeaders?: TeamLeader[];
-    topic: string;
+    topic?: string | null;
     messages?: Message[];
     lastMessage?: Message;
     unreadMessagesCount?: number;
     updatedAt: string;
     assignee?: TeamLeader;
+    ticketLink?: string | null;
 };
 
 export type ConversationSearchResults = Omit<Conversation, 'teamLeaders' | 'status' | 'topic'> & {

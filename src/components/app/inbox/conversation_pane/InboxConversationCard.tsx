@@ -1,19 +1,42 @@
 import { Badge } from "@/components/ui/badge";
-import UserInfoAvatar from "../../common/cards/UserInfoAvatar";
 import { Conversation } from "@/lib/types";
 import moment from "moment";
-import { getUser } from "@/lib/auh/auth-utils";
 import { useSession } from "@/lib/auh/auth-client";
+import { cn } from "@/lib/utils";
+import { useSelector } from "react-redux";
+import { selectSelectedConversation } from "@/stores/features/conversation/conversationSlice";
 
 export default function InboxConversationCard({
 	conversation,
+	selected,
 }: {
 	conversation: Omit<Conversation, "teamLeaders" | "topic">;
+	selected: boolean;
 }) {
 	const { data: session } = useSession();
+
+	// set the conversation id in the url params
+	const setConversationIdInParams = (conversationId: string) => {
+		const searchParams = new URLSearchParams(window.location.search);
+		searchParams.set("conversation_id", conversationId);
+		const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+		window.history.pushState({}, "", newUrl);
+	};
+
+	const selectedConversationId = useSelector(selectSelectedConversation);
+
 	return (
 		<div className="flex flex-col gap-3">
-			<div className="flex  flex-col gap-2 justify-between p-2 md:p-4 bg-card rounded-xl border shadow-sm hover:bg-accent/50 cursor-pointer transition-colors">
+			<div
+				className={cn(
+					"flex   flex-col gap-2 justify-between p-2 md:p-4 bg-card rounded-xl border shadow-sm hover:bg-accent/50 cursor-pointer transition-colors",
+					selected && "bg-blue-100 hover:bg-blue-100"
+				)}
+				onClick={() => {
+					selectedConversationId !== conversation.id &&
+						setConversationIdInParams(conversation.id);
+				}}
+			>
 				<div className="flex flex-row w-fit ml-auto">
 					<p className="text-xs text-muted-foreground">
 						{moment(conversation.lastMessage?.createdAt).calendar(null, {

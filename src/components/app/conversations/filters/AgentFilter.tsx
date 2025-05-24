@@ -14,17 +14,19 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
 import { useLoadAgentsFilter } from "@/services/queries/filters";
 
-export default function AgentFilter() {
+export default memo(function AgentFilter({
+	agentsParams,
+}: {
+	agentsParams: string | null;
+}) {
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState("");
 	const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
 	const [sortedAgents, setSortedAgents] = useState<string[]>([]);
-	const searchParams = useSearchParams();
 
 	// load agents
 	const { data: agents, isLoading: agentsLoading } = useLoadAgentsFilter();
@@ -37,16 +39,21 @@ export default function AgentFilter() {
 
 	// handle search params change
 	useEffect(() => {
-		const agents = searchParams.get("agents");
-
-		if (agents) {
-			setSelectedAgents(agents.split(","));
+		if (agentsParams) {
+			setSelectedAgents(agentsParams.split(","));
 		} else {
 			setSelectedAgents([]);
 		}
-	}, [searchParams]);
+	}, [agentsParams]);
+
+	const isFirstRun = useRef(true);
 
 	useEffect(() => {
+		if (isFirstRun.current) {
+			isFirstRun.current = false;
+			return;
+		}
+
 		if (!open) {
 			const searchParams = new URLSearchParams(window.location.search);
 			if (selectedAgents.length > 0) {
@@ -131,4 +138,4 @@ export default function AgentFilter() {
 			</PopoverContent>
 		</Popover>
 	);
-}
+});

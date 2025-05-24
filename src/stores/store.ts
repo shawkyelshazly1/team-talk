@@ -1,10 +1,10 @@
 "use client";
 import { configureStore } from '@reduxjs/toolkit';
-import conversationReducer from './features/conversation/conversationSlice';
+import conversationsReducer from './features/conversation/conversationSlice';
 import userReducer from './features/user/userSlice';
 export const store = configureStore({
     reducer: {
-        conversation: conversationReducer,
+        conversation: conversationsReducer,
         user: userReducer
     }
 });

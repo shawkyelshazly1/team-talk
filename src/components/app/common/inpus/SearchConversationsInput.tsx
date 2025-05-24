@@ -4,23 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Search, X } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import ClearSearchInput from "../buttons/ClearSearchInput";
 
-export default function SearchConversationsInput() {
+export default memo(function SearchConversationsInput({
+	query,
+}: {
+	query: string | null;
+}) {
 	const [searchQuery, setSearchQuery] = useState("");
 	const searchRef = useRef<HTMLInputElement>(null);
-	const searchParams = useSearchParams();
 
 	useEffect(() => {
-		const query = searchParams.get("query");
-
 		if (query) {
 			setSearchQuery(query);
 		} else {
 			setSearchQuery("");
 		}
-	}, [searchParams]);
+	}, [query]);
 
 	function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
 		if (e.key === "Enter") {
@@ -53,25 +54,11 @@ export default function SearchConversationsInput() {
 				placeholder="Search in conversations"
 				className="w-full focus-visible:border-0 focus-visible:ring-0 border-0 ring-0 outline-none shadow-none "
 			/>
-			<Button
-				variant="outline"
-				className={cn(
-					"p-0 rounded-full bg-transparent outline-0 border-0 ring-0 ring-offset-0 cursor-pointer m-0 hover:bg-muted-foreground/10 hidden",
-					searchQuery.length > 0 && "inline-block"
-				)}
-				onClick={() => {
-					setSearchQuery("");
-					const searchParams = new URLSearchParams(window.location.search);
-					searchParams.delete("query");
-					const newUrl = `${
-						window.location.pathname
-					}?${searchParams.toString()}`;
-					window.history.pushState({}, "", newUrl);
-					searchRef.current?.focus();
-				}}
-			>
-				<X size={25} />
-			</Button>
+			<ClearSearchInput
+				searchQuery={searchQuery}
+				setSearchQuery={setSearchQuery}
+				searchRef={searchRef as React.RefObject<HTMLInputElement>}
+			/>
 		</div>
 	);
-}
+});

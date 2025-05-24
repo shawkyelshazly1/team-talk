@@ -1,34 +1,34 @@
-"use client";
-
 import { Checkbox } from "@/components/ui/checkbox";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auh/auth-client";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
-export default function MyConversations() {
-	const { data: session, isPending } = useSession();
+export default memo(function MyConversations({
+	agentsParams,
+	query,
+}: {
+	agentsParams: string | null;
+	query: string | null;
+}) {
+	const { data: session } = useSession();
 
 	let userEmail = session?.user?.email;
 
-	const searchParams = useSearchParams();
 	const [checked, setChecked] = useState(false);
 
 	useEffect(() => {
-		const agents = searchParams.get("agents");
-
-		if (agents) {
-			setChecked(agents.split(",").includes(userEmail ?? ""));
+		if (agentsParams) {
+			setChecked(agentsParams.split(",").includes(userEmail ?? ""));
 		} else {
 			setChecked(false);
 		}
-	}, [searchParams]);
+	}, [agentsParams]);
 
 	return (
 		<div className="flex items-center space-x-2">
 			<Checkbox
 				id="my-conversations"
 				checked={checked}
+				disabled={query?.trim() === undefined}
 				onCheckedChange={() => {
 					const searchParams = new URLSearchParams(window.location.search);
 					if (!checked) {
@@ -50,4 +50,4 @@ export default function MyConversations() {
 			</label>
 		</div>
 	);
-}
+});

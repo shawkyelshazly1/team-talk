@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { useLoadConversations } from "@/services/queries/conversation";
+import { useLoadhistoricalConversations } from "@/services/queries/conversation";
 import { useSearchParams } from "next/navigation";
 import { SyncLoader } from "react-spinners";
 import { columns } from "@/components/app/conversations/conversations_table/columns";
@@ -35,7 +35,7 @@ export function ConversationsTable() {
 		isLoading,
 		isRefetching,
 		refetch,
-	} = useLoadConversations({
+	} = useLoadhistoricalConversations({
 		agents: searchParams.get("agents") ?? "",
 		teamLeaders: searchParams.get("teamLeaders") ?? "",
 		take: pagination.pageSize,

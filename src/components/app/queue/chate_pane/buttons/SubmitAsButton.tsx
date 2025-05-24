@@ -8,11 +8,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 export default function SubmitAsButton() {
 	const [selectedTopic, setSelectedTopic] = useState<string>("");
-	const [status, setStatus] = useState<"solved" | "pending" | "">("");
+	const [status, setStatus] = useState<"solved" | "pending" | "closed" | "">(
+		""
+	);
 	const [statusHolder, setStatusHolder] = useState<"solved" | "pending" | "">(
 		""
 	);
@@ -27,7 +30,13 @@ export default function SubmitAsButton() {
 					setIsOpenTopicsModal(true);
 				}}
 			>
-				<SelectTrigger className="w-[120px] cursor-pointer bg-black/80 text-white font-semibold placeholder:text-white data-[placeholder]:text-white mb-1 mr-1 rounded-lg">
+				<SelectTrigger
+					className={cn(
+						" w-[120px] cursor-pointer bg-black/80  text-white font-semibold placeholder:text-white data-[placeholder]:text-white mb-1 mr-1 rounded-lg",
+						status === "solved" && "bg-[#27AE60]",
+						status === "pending" && "bg-[#F5A623]"
+					)}
+				>
 					<SelectValue
 						placeholder="Submit as"
 						className="text-white placeholder:text-white"

@@ -1,11 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ClearFiltersButton() {
-	const searchParams = useSearchParams();
+export default function ClearFiltersButton({
+	searchParams,
+}: {
+	searchParams: URLSearchParams;
+}) {
 	const [hasFilters, setHasFilters] = useState(false);
 
 	useEffect(() => {

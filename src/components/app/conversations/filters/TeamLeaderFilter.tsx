@@ -14,17 +14,19 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronsUpDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
 import { useLoadTeamleadersFilter } from "@/services/queries/filters";
 
-export default function TeamLeaderFilter() {
+export default memo(function TeamLeaderFilter({
+	teamLeadersParams,
+}: {
+	teamLeadersParams: string | null;
+}) {
 	const [open, setOpen] = useState(false);
 	const [value, setValue] = useState("");
 	const [selectedTeamLeaders, setSelectedTeamLeaders] = useState<string[]>([]);
 	const [sortedTeamLeaders, setSortedTeamLeaders] = useState<string[]>([]);
-	const searchParams = useSearchParams();
 
 	// load team leaders
 	const { data: teamLeaders, isLoading: teamLeadersLoading } =
@@ -38,17 +40,22 @@ export default function TeamLeaderFilter() {
 	}, [teamLeaders]);
 
 	useEffect(() => {
-		const teamLeaders = searchParams.get("teamLeaders");
-
-		if (teamLeaders) {
-			setSelectedTeamLeaders(teamLeaders.split(","));
+		if (teamLeadersParams) {
+			setSelectedTeamLeaders(teamLeadersParams.split(","));
 		} else {
 			setSelectedTeamLeaders([]);
 		}
-	}, [searchParams]);
+	}, [teamLeadersParams]);
+
+	const isFirstRun = useRef(true);
 
 	// handle team leaders search params change
 	useEffect(() => {
+		if (isFirstRun.current) {
+			isFirstRun.current = false;
+			return;
+		}
+
 		if (!open) {
 			const searchParams = new URLSearchParams(window.location.search);
 			if (selectedTeamLeaders.length > 0) {
@@ -135,4 +142,4 @@ export default function TeamLeaderFilter() {
 			</PopoverContent>
 		</Popover>
 	);
-}
+});

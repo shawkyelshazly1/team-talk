@@ -11,7 +11,7 @@ type SearchConversationsProps = {
     teamLeaders: string,
 
 };
-// search conversations query and filters
+// search conversations by query and filters
 export function useSearchConversations(props: SearchConversationsProps) {
 
     return useQuery<ConversationSearchResults[]>({
@@ -29,17 +29,25 @@ type LoadConversationsProps = {
     take: number,
     skip: number,
 };
-export function useLoadConversations(props: LoadConversationsProps) {
+export function useLoadhistoricalConversations(props: LoadConversationsProps) {
     return useQuery<Conversation[]>({
-        queryKey: ["conversations", props.agents, props.teamLeaders],
-        queryFn: () => axiosInstance.get(`/conversations/load/all?agents=${props.agents}&teamLeaders=${props.teamLeaders}&take=${props.take}&skip=${props.skip}`).then(res => res.data),
+        queryKey: ["conversations", props.agents, props.teamLeaders, props.take, props.skip],
+        queryFn: () => axiosInstance.get(`/conversations/load/all?${props.agents ? `&agents=${props.agents}` : ""}${props.teamLeaders ? `&teamLeaders=${props.teamLeaders}` : ""}${props.take ? `&take=${props.take}` : ""}${props.skip >= 0 ? `&skip=${props.skip}` : ""}`).then(res => res.data),
     });
 }
 
 // load csr conversations by status
-export function useLoadCsrConversations(status: Conversation['status']) {
-    return useQuery<Conversation[]>({
-        queryKey: ["csr_conversations", status],
-        queryFn: () => axiosInstance.get(`/conversations/csr?status=${status}`).then(res => res.data),
+export function useLoadCsrConversations(status: Conversation['status'], take: number, skip: number) {
+    return useQuery<{ conversations: Conversation[], total: number; }>({
+        queryKey: ["csr_conversations", status, take, skip],
+        queryFn: () => axiosInstance.get(`/conversations/csr?status=${status}&take=${take}&skip=${skip}`).then(res => res.data),
+    });
+}
+
+// load tl assigned conversations by status
+export function useLoadTlAssignedConversations(status: Conversation['status'], take: number, skip: number) {
+    return useQuery<{ conversations: Conversation[], total: number; }>({
+        queryKey: ["tl_assigned_conversations", status, take, skip],
+        queryFn: () => axiosInstance.get(`/conversations/team_lead?status=${status}&take=${take}&skip=${skip}`).then(res => res.data),
     });
 }

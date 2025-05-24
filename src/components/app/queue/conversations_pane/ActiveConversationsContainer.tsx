@@ -25,9 +25,9 @@ export default function ActiveConversationsContainer() {
 		});
 	return (
 		<div className="flex flex-col gap-2 overflow-y-auto h-[92vh] pt-4 px-2">
-			<h1 className="text-lg font-medium mx-auto">
-				No Assigned Active Conversations
-			</h1>
+			<div className="flex justify-center items-center h-full">
+				<p className="text-muted-foreground">No Active conversations</p>
+			</div>
 			{activeConversations.map((conversation) => (
 				<ConversationCard key={conversation.id} conversation={conversation} />
 			))}

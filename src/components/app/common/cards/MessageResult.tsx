@@ -10,7 +10,9 @@ export default function MessageResult({
 }: {
 	message: ConversationSearchResults["message"];
 }) {
-	const [isExpanded, setIsExpanded] = useState(!(message.content.length > 100));
+	const [isExpanded, setIsExpanded] = useState(
+		!(message?.content?.length > 100)
+	);
 	const searchParams = useSearchParams();
 	const searchTerm = searchParams.get("query");
 	return (
@@ -26,7 +28,7 @@ export default function MessageResult({
 							: [""]
 					}
 					autoEscape={true}
-					textToHighlight={message.content.slice(0, 100) + "..." + " "}
+					textToHighlight={message?.content?.slice(0, 100) + "..." + " "}
 				/>
 			) : (
 				<Highlighter
@@ -39,7 +41,7 @@ export default function MessageResult({
 							: [""]
 					}
 					autoEscape={true}
-					textToHighlight={message.content}
+					textToHighlight={message?.content}
 				/>
 			)}
 			{!isExpanded && <ShowMoreButon setIsExpanded={setIsExpanded} />}

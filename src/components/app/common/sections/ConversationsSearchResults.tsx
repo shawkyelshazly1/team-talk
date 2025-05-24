@@ -12,7 +12,6 @@ export default function ConversationsSearchResults() {
 	const searchParams = useSearchParams();
 	const searchQuery = searchParams.get("query");
 	const agents = searchParams.get("agents");
-	console.log(searchQuery?.trim() === undefined);
 
 	const {
 		data: conversations,
@@ -24,12 +23,6 @@ export default function ConversationsSearchResults() {
 		agents: agents ?? "",
 		teamLeaders: "",
 	});
-
-	useEffect(() => {
-		if (searchQuery?.trim() !== undefined) {
-			refetch();
-		}
-	}, [searchQuery, agents]);
 
 	return (
 		<div className="flex flex-col w-full gap-2 h-[80vh] overflow-y-auto">
