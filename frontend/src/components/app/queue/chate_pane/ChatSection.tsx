@@ -18,7 +18,6 @@ export default function ChatSection() {
 	useEffect(() => {
 		// on first load, set the conversation id for 1st in basket in the url params
 		if (basket.length > 0 && userStatus === "online") {
-			console.log("setting conversation id", basket[0].id);
 			const searchParams = new URLSearchParams(window.location.search);
 			searchParams.set("conversation_id", basket[0].id);
 			const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
