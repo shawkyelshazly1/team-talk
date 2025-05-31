@@ -9,19 +9,22 @@ import { SyncLoader } from "react-spinners";
 import BasketTabs from "./BasketTabs";
 import ChatContainer from "./ChatContainer";
 import { useEffect } from "react";
+import { selectSelectedConversation } from "@/stores/features/conversation/conversationSlice";
 export default function ChatSection() {
 	const basket = useSelector(selectBasket);
 	const userStatus = useSelector(selectUserStatus);
+	const selectedConversation = useSelector(selectSelectedConversation);
 
 	useEffect(() => {
 		// on first load, set the conversation id for 1st in basket in the url params
 		if (basket.length > 0 && userStatus === "online") {
+			console.log("setting conversation id", basket[0].id);
 			const searchParams = new URLSearchParams(window.location.search);
 			searchParams.set("conversation_id", basket[0].id);
 			const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
 			window.history.pushState({}, "", newUrl);
 		}
-	}, []);
+	}, [userStatus]);
 
 	return userStatus === "online" ? (
 		<div className="  h-[100vh] pb-4 pt-1 w-full px-2 gap-2 flex flex-col">
@@ -31,10 +34,12 @@ export default function ChatSection() {
 					<SyncLoader size={10} color="#000" />
 				</div>
 			) : (
-				<>
-					<BasketTabs />
-					<ChatContainer />
-				</>
+				selectedConversation !== "" && (
+					<>
+						<BasketTabs />
+						<ChatContainer />
+					</>
+				)
 			)}
 		</div>
 	) : null;
