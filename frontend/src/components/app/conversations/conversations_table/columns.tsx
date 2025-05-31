@@ -12,12 +12,17 @@ import {
 } from "@/components/ui/hover-card";
 import { Conversation } from "@/lib/types";
 import StatusBagde from "../../common/badges/StatusBagde";
+import moment from "moment";
 
 export const columns: ColumnDef<Conversation>[] = [
 	{
 		header: () => <div className="text-center">CreatedAt</div>,
 		cell: ({ row }) => {
-			return <div className="text-center">{row.original.createdAt}</div>;
+			return (
+				<div className="text-center">
+					{moment(row.original.createdAt).format("DD/MM/YYYY hh:mm A")}
+				</div>
+			);
 		},
 		accessorKey: "createdAt",
 	},

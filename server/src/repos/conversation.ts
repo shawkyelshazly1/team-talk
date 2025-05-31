@@ -360,6 +360,15 @@ export const loadConversationById = async (id: string) => {
                     role: true,
                 },
             },
+            assignee: {
+                columns: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                    role: true,
+                },
+            }
         },
         columns: {
             createdAt: true,
@@ -378,6 +387,7 @@ export const loadConversationById = async (id: string) => {
         ...conv,
         agent: conv.agent as Agent,
         topic: conv.topic ?? "",
+        assignee: conv.assignee as TeamLeader,
     } satisfies Conversation;
 };
 
