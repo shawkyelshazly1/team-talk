@@ -9,22 +9,33 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Conversation } from "@/lib/types";
 
-export default function SubmitAsButton() {
-	const [selectedTopic, setSelectedTopic] = useState<string>("");
-	const [status, setStatus] = useState<"solved" | "pending" | "closed" | "">(
+export default function SubmitAsButton({
+	conversation,
+}: {
+	conversation: Conversation;
+}) {
+	const [status, setStatus] = useState<"pending" | "solved" | "">("");
+	const [statusHolder, setStatusHolder] = useState<Conversation["status"] | "">(
 		""
 	);
-	const [statusHolder, setStatusHolder] = useState<"solved" | "pending" | "">(
-		""
-	);
+
+	// set status from conversation on conversation change
+	useEffect(() => {
+		if (["pending", "solved"].includes(conversation?.status ?? "")) {
+			setStatus(conversation?.status as "pending" | "solved" | "");
+		} else {
+			setStatus("");
+		}
+	}, [conversation]);
 
 	const [isOpenTopicsModal, setIsOpenTopicsModal] = useState(false);
 	return (
 		<>
 			<Select
-				value={status}
+				value={status! as string}
 				onValueChange={(value) => {
 					setStatusHolder(value as "solved" | "pending");
 					setIsOpenTopicsModal(true);
@@ -36,6 +47,7 @@ export default function SubmitAsButton() {
 						status === "solved" && "bg-[#27AE60]",
 						status === "pending" && "bg-[#F5A623]"
 					)}
+					disabled={conversation?.status === "closed"}
 				>
 					<SelectValue
 						placeholder="Submit as"
@@ -63,8 +75,6 @@ export default function SubmitAsButton() {
 				setOpen={setIsOpenTopicsModal}
 				setStatus={setStatus}
 				statusHolder={statusHolder}
-				selectedTopic={selectedTopic}
-				setSelectedTopic={setSelectedTopic}
 			/>
 		</>
 	);

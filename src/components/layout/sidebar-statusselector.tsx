@@ -1,15 +1,25 @@
 "use client";
 import {
+	clearBasket,
 	selectUserStatus,
 	setUserStatus,
 } from "@/stores/features/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { setSelectedConversation } from "@/stores/features/conversation/conversationSlice";
 
 export default function SidebarStatusSelector() {
 	const dispatch = useDispatch();
 	const userStatus = useSelector(selectUserStatus);
+	const router = useRouter();
+
+	const removeAllParamsFromUrl = () => {
+		const newUrl = `${window.location.pathname}`;
+		window.history.pushState({}, "", newUrl);
+	};
+
 	return (
 		<>
 			<DropdownMenuItem
@@ -31,6 +41,11 @@ export default function SidebarStatusSelector() {
 			<DropdownMenuItem
 				onClick={() => {
 					dispatch(setUserStatus({ status: "offline" }));
+					dispatch(clearBasket());
+					dispatch(setSelectedConversation(""));
+					// TODO: unassign conversations on server side
+					// remove all params from the url
+					removeAllParamsFromUrl();
 				}}
 				className={cn("cursor-pointer hover:bg-sidebar-accent p-0")}
 			>

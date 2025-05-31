@@ -2,24 +2,18 @@
 
 import Link from "next/link";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
-import { Inbox, MessagesSquare, Search } from "lucide-react";
+import { Inbox, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auh/auth-client";
-import Loading from "@/app/app/loading";
 import { ClipLoader } from "react-spinners";
 
 // Team_lead Menu items.
 const team_lead_menu_items = [
 	{
-		title: "Queue",
+		title: "Chat",
 		url: "/app",
 		icon: Inbox,
-	},
-	{
-		title: "Conversations",
-		url: "/app/conversations",
-		icon: MessagesSquare,
 	},
 ];
 
@@ -39,6 +33,7 @@ const csr_menu_items = [
 export default function SidebarMenuLinks() {
 	const { data: session, isPending } = useSession();
 	const pathname = usePathname();
+
 	const menu_items =
 		session?.user.role === "csr" ? csr_menu_items : team_lead_menu_items;
 
@@ -61,7 +56,11 @@ export default function SidebarMenuLinks() {
 								: "hover:bg-black/10"
 						)}
 					>
-						<Link href={item.url}>
+						<Link
+							className={cn(pathname === item.url && "pointer-events-none")}
+							tabIndex={pathname === item.url ? -1 : 0}
+							href={item.url}
+						>
 							<item.icon size={20} />
 							<h2 className="text-sm font-normal">{item.title}</h2>
 						</Link>

@@ -1,39 +1,41 @@
 "use client";
 
-import { JSX, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import NewMessages from "../buttons/NewMessages";
 import EventMessage from "../messages/EventMessage";
 import SentMessage from "../messages/SentMessage";
 import ReceivedMessage from "../messages/ReceivedMessage";
+import { useLoadConversationMessagesById } from "@/services/queries/conversation";
+import { Conversation, Message } from "@/lib/types";
+import { useSession } from "@/lib/auh/auth-client";
+import { ClipLoader } from "react-spinners";
+import { Button } from "@/components/ui/button";
 
-export default function MessagesSection() {
+export default function MessagesSection({
+	conversation,
+}: {
+	conversation: Conversation;
+}) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const { data: session } = useSession();
 
-	const [messages, setMessages] = useState<JSX.Element[]>([
-		// TODO: remove this
-		<SentMessage key={0} />,
-		<ReceivedMessage key={1} />,
-		<ReceivedMessage key={2} />,
-		<ReceivedMessage key={3} />,
-		<ReceivedMessage key={4} />,
-		<ReceivedMessage key={5} />,
-		<ReceivedMessage key={6} />,
-		<ReceivedMessage key={7} />,
-		<ReceivedMessage key={8} />,
-		<ReceivedMessage key={9} />,
-		<ReceivedMessage key={10} />,
-		<ReceivedMessage key={11} />,
-		<ReceivedMessage key={12} />,
-		<ReceivedMessage key={13} />,
-		<ReceivedMessage key={14} />,
-		<ReceivedMessage key={15} />,
-		<ReceivedMessage key={16} />,
-		<ReceivedMessage key={17} />,
-		<SentMessage key={18} />,
-		<SentMessage key={19} />,
-	]);
+	const [messages, setMessages] = useState<Message[]>([]);
 	const [isMessagesEndRefInView, setIsMessagesEndRefInView] = useState(false);
 	const [isNewMessages, setIsNewMessages] = useState(false);
+
+	const {
+		data: loadedMessages,
+		status,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useLoadConversationMessagesById(conversation?.id ?? "", 10);
+
+	useEffect(() => {
+		if (loadedMessages) {
+			setMessages(loadedMessages.pages.flatMap((page) => page.messages));
+		}
+	}, [loadedMessages]);
 
 	// Set the messages end ref observer
 	useEffect(() => {
@@ -82,12 +84,33 @@ export default function MessagesSection() {
 	}, [messages]);
 
 	return (
-		<div className="flex-1   overflow-y-auto gap-3 flex-col-reverse flex w-full pt-2 px-2">
+		<div className="flex-1   overflow-y-auto gap-3 flex-col-reverse flex w-full pt-2 px-2 ">
 			<div ref={messagesEndRef}></div>
-			{messages}
+			{messages.map((message) => {
+				if (message.sender.id === session?.user?.id) {
+					return <SentMessage key={message.id} message={message} />;
+				} else {
+					return <ReceivedMessage key={message.id} message={message} />;
+				}
+			})}
 			<EventMessage />
 			{/* FIXME: FIX THIS ON MESSAGES FETCHING  */}
 			{isNewMessages && <NewMessages scrollToBottom={scrollToBottom} />}
+			{hasNextPage && (
+				<div className="flex justify-center items-center mt-2">
+					<Button
+						className="cursor-pointer w-[8rem]"
+						onClick={() => fetchNextPage()}
+						disabled={isFetchingNextPage}
+					>
+						{isFetchingNextPage ? (
+							<ClipLoader color="#fff" size={10} />
+						) : (
+							"Load More"
+						)}
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }

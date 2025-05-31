@@ -1,25 +1,21 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Message } from "@/lib/types";
 
-export default function ReceivedMessage() {
+export default function ReceivedMessage({ message }: { message: Message }) {
 	return (
 		<div className="flex flex-row gap-1 w-fit max-w-2/3">
 			<Avatar className="w-10 h-10">
 				<AvatarImage
 					loading="lazy"
-					src="https://avatar.iran.liara.run/public/boy"
+					src={message.sender.image ?? ""}
 					alt="User avatar"
 				/>
-				<AvatarFallback>un</AvatarFallback>
+				<AvatarFallback>{message.sender.name?.charAt(0)}</AvatarFallback>
 			</Avatar>
 			<div className="flex flex-col gap-1">
-				<p className="text-sm font-medium">John Doe</p>
+				<p className="text-sm font-medium capitalize">{message.sender.name}</p>
 				<p className="text-sm text-muted-foreground bg-[#f2f2f2] rounded-lg p-2">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
-					quos.Lorem ipsum dolor sit amet consectetur adipisicing elit.
-					Quisquam, quos.Lorem ipsum dolor sit amet consectetur adipisicing
-					elit. Quisquam, quos.Lorem ipsum dolor sit amet consectetur
-					adipisicing elit. Quisquam, quos.Lorem ipsum dolor sit amet
-					consectetur adipisicing elit. Quisquam, quos.
+					{message.content}
 				</p>
 				<p className="text-xs text-muted-foreground ml-auto">2:30 PM</p>
 			</div>

@@ -11,6 +11,7 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Conversation } from "@/lib/types";
+import StatusBagde from "../../common/badges/StatusBagde";
 
 export const columns: ColumnDef<Conversation>[] = [
 	{
@@ -137,13 +138,7 @@ export const columns: ColumnDef<Conversation>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="text-center">
-					{row.original.status === "pending" ? (
-						<PendingBadge />
-					) : row.original.status === "active" ? (
-						<NewBadge />
-					) : (
-						<SolvedBadge />
-					)}
+					<StatusBagde conversation={row.original} />
 				</div>
 			);
 		},

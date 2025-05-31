@@ -20,9 +20,7 @@ export default function ConversationsSearchResultCard({
 		<div
 			className="flex flex-col w-full gap-4 bg-white rounded-lg hover:bg-gray-200 p-4 cursor-pointer shadow-md"
 			onClick={() => {
-				session?.user?.role === ("team_lead" as User["role"])
-					? router.push(`/app/queue/?conversation_id=${conversation.id}`)
-					: router.push(`/app/inbox/?conversation_id=${conversation.id}`);
+				router.push(`/app/conversation/${conversation.id}`);
 			}}
 		>
 			<div className="flex flex-row justify-between">
@@ -35,7 +33,10 @@ export default function ConversationsSearchResultCard({
 			</div>
 			<div className="">
 				<span className="text-sm text-gray-600 font-medium">
-					{conversation.message?.sender.name}:{" "}
+					{session?.user?.id !== conversation.message.sender.id
+						? conversation.message?.sender.name
+						: "You"}
+					:{" "}
 				</span>
 
 				<MessageResult message={conversation.message} />

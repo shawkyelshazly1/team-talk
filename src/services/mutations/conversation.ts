@@ -2,6 +2,7 @@
 import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../axiosInstance";
 import toast from "react-hot-toast";
+import { Conversation } from "@/lib/types";
 
 
 
@@ -15,6 +16,23 @@ export const useCreateConversation = (queryClient: QueryClient) => {
         },
         onError: (error) => {
             toast.error("Failed to create conversation");
+        }
+    });
+};
+
+// set conversation status
+export const useSetConversationStatus = (queryClient: QueryClient) => {
+    return useMutation({
+        mutationFn: (data: { conversationId: string, status: "pending" | "solved", topic: string; }) => axiosInstance.post("/conversations/update/status", data),
+        onSuccess: (data: { data: Conversation; }) => {
+            toast.success("Conversation status updated successfully");
+
+
+            queryClient.invalidateQueries({ queryKey: ["conversation", data.data.id] });
+        },
+        onError: (error) => {
+
+            toast.error("Failed to update conversation status");
         }
     });
 };

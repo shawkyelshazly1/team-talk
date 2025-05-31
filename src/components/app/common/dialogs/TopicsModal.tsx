@@ -8,14 +8,18 @@ import {
 
 import { Button } from "@/components/ui/button";
 import SelectTopicMenu from "../menus/SelectTopicMenu";
+import { Conversation } from "@/lib/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useSetConversationStatus } from "@/services/mutations/conversation";
+import { ClipLoader } from "react-spinners";
+import { useSelectedConversation } from "@/hooks/conversation";
 
 type TopicsModalProps = {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	setStatus: (status: "solved" | "pending") => void;
-	statusHolder: "solved" | "pending" | "";
-	selectedTopic: string;
-	setSelectedTopic: (topic: string) => void;
+	statusHolder: Conversation["status"] | "";
 };
 
 export default function TopicsModal({
@@ -23,9 +27,18 @@ export default function TopicsModal({
 	setOpen,
 	setStatus,
 	statusHolder,
-	selectedTopic,
-	setSelectedTopic,
 }: TopicsModalProps) {
+	const conversation = useSelectedConversation();
+
+	const queryClient = useQueryClient();
+
+	const [selectedTopic, setSelectedTopic] = useState<string>(
+		conversation?.topic ?? ""
+	);
+
+	const { mutate: setConversationStatus, isPending } =
+		useSetConversationStatus(queryClient);
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogContent>
@@ -41,16 +54,30 @@ export default function TopicsModal({
 				/>
 				<Button
 					variant="default"
-					disabled={!selectedTopic}
-					className=" w-fit mx-auto cursor-pointer capitalize"
+					disabled={!selectedTopic || isPending}
+					className=" min-w-[150px] mx-auto cursor-pointer capitalize"
 					onClick={() => {
 						if (selectedTopic) {
-							setOpen(false);
-							setStatus(statusHolder as "solved" | "pending");
+							setConversationStatus(
+								{
+									conversationId: conversation?.id,
+									status: statusHolder as "solved" | "pending",
+									topic: selectedTopic,
+								},
+								{
+									onSuccess: () => {
+										setOpen(false);
+									},
+								}
+							);
 						}
 					}}
 				>
-					set as {statusHolder}
+					{isPending ? (
+						<ClipLoader color="#fff" size={25} />
+					) : (
+						`set as ${statusHolder}`
+					)}
 				</Button>
 			</DialogContent>
 		</Dialog>

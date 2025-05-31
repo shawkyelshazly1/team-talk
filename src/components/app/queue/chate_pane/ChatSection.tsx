@@ -1,20 +1,30 @@
 "use client";
 // import RichMessageInput from "./message_input/RichMessageInput";
-import ChatHeader from "./ChatHeader";
-import { Suspense } from "react";
-import MessagesSection from "../../common/sections/MessagesSection";
-import MessageInput from "../../common/message_inputs/MessageInput";
 import { useSelector } from "react-redux";
 import {
 	selectBasket,
 	selectUserStatus,
 } from "@/stores/features/user/userSlice";
 import { SyncLoader } from "react-spinners";
+import BasketTabs from "./BasketTabs";
+import ChatContainer from "./ChatContainer";
+import { useEffect } from "react";
 export default function ChatSection() {
 	const basket = useSelector(selectBasket);
 	const userStatus = useSelector(selectUserStatus);
-	return (
-		<div className="  h-[100vh] py-4 w-1/2 lg:w-2/3 px-2 gap-2 flex flex-col">
+
+	useEffect(() => {
+		// on first load, set the conversation id for 1st in basket in the url params
+		if (basket.length > 0 && userStatus === "online") {
+			const searchParams = new URLSearchParams(window.location.search);
+			searchParams.set("conversation_id", basket[0].id);
+			const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+			window.history.pushState({}, "", newUrl);
+		}
+	}, []);
+
+	return userStatus === "online" ? (
+		<div className="  h-[100vh] pb-4 pt-1 w-full px-2 gap-2 flex flex-col">
 			{userStatus === "online" && basket.length === 0 ? (
 				<div className="w-full h-full flex flex-col items-center justify-center gap-2">
 					<h1 className="text-2xl font-bold">Queue is empty</h1>
@@ -22,19 +32,10 @@ export default function ChatSection() {
 				</div>
 			) : (
 				<>
-					<ChatHeader />
-					<Suspense fallback={<h1>loading</h1>}>
-						<MessagesSection />
-					</Suspense>
-					<Suspense fallback={<h1>loading</h1>}>
-						<MessageInput />
-						{/* <RichMessageInput /> */}
-					</Suspense>
-					<p className="text-xs text-muted-foreground text-center">
-						This conversation will be closed in 30 minutes
-					</p>
+					<BasketTabs />
+					<ChatContainer />
 				</>
 			)}
 		</div>
-	);
+	) : null;
 }

@@ -18,6 +18,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
 
 export default function NewConversationModal() {
 	const [ticketLink, setTicketLink] = useState("");
@@ -91,6 +92,17 @@ export default function NewConversationModal() {
 											clearState();
 											// set the conversation as selected in store
 											dispatch(setSelectedConversation(data.data.id));
+
+											// set the conversation Id in the url
+											const params = new URLSearchParams(
+												window.location.search
+											);
+											params.set("conversation_id", data.data.id);
+											window.history.pushState(
+												{},
+												"",
+												`${window.location.pathname}?${params.toString()}`
+											);
 										},
 									}
 								);

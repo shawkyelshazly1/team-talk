@@ -2,7 +2,7 @@ export type Conversation = {
     id: string;
     agent: Agent;
     createdAt: string;
-    status: "pending" | "active" | "closed";
+    status: "pending" | "active" | "closed" | "solved";
     teamLeaders?: TeamLeader[];
     topic?: string | null;
     messages?: Message[];

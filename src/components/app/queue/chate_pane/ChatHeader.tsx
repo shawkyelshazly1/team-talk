@@ -1,31 +1,32 @@
 import SubmitAsButton from "./buttons/SubmitAsButton";
-import PendingBadge from "../../common/badges/PendingBadge";
-import SolvedBadge from "../../common/badges/SolvedBadge";
-import NewBadge from "../../common/badges/NewBadge";
-import UserInfoAvatar from "../../common/cards/UserInfoAvatar";
 import OpenTicketButton from "./buttons/OpenTicketButton";
+import StatusBagde from "../../common/badges/StatusBagde";
+import AgentInfoAvatar from "../../common/cards/AgentInfoAvatar";
+import { Conversation, User } from "@/lib/types";
+import { useSession } from "@/lib/auh/auth-client";
 
-export default function ChatHeader() {
+export default function ChatHeader({
+	conversation,
+}: {
+	conversation: Conversation;
+}) {
+	const { data: session } = useSession();
+
 	return (
 		<div className="flex flex-row items-center justify-between border-b border-border pb-4">
 			<div className="flex flex-row gap-2">
-				<UserInfoAvatar
-					user={{
-						id: "1",
-						name: "John Doe",
-						email: "email@example.com",
-						image: "https://avatar.iran.liara.run/public/boy",
-						role: "csr",
-					}}
-				/>
+				{conversation.agent.id === session?.user?.id ? null : (
+					<AgentInfoAvatar conversation={conversation} />
+				)}
 
-				<SolvedBadge />
-				<PendingBadge />
-				<NewBadge />
+				<StatusBagde conversation={conversation} />
 			</div>
 			<div className="flex flex-row gap-2">
-				<OpenTicketButton />
-				<SubmitAsButton />
+				<OpenTicketButton conversation={conversation} />
+				{conversation?.status !== "closed" &&
+					session?.user?.role !== ("csr" as User["role"]) && (
+						<SubmitAsButton conversation={conversation} />
+					)}
 			</div>
 		</div>
 	);
