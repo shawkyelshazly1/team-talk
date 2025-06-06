@@ -3,15 +3,18 @@ import authRouter from "./routers/auth";
 import cors from "cors";
 import conversationRouter from "./routers/conversation";
 import filtersRouter from "./routers/filters";
-import { meilisearch } from "./lib/meilisearch";
 import { verifyConnections } from "./utils/verifyConnections";
 import healthCheckRouter from "./utils/healthChecks";
-import { redisClient, connectRedis } from "./redis/connection";
-const app = express();
+import { connectRedis } from "./redis/connection";
+import { initializeSocketIO } from "./socketio";
+import { createServer } from 'http';
 
+// initialize PORT
 const PORT = 5000;
 
-
+// create express app instance
+const app = express();
+const httpServer = createServer(app);
 
 // Configure CORS middleware
 app.use(
@@ -22,21 +25,29 @@ app.use(
     })
 );
 
+// register routers
 app.use(authRouter);
+
+// register json middleware
 app.use(express.json());
 
-// regiser routers
+// register routers
 app.use("/api/conversations", conversationRouter);
 app.use("/api/filters", filtersRouter);
 
+// register health check router
 app.use(healthCheckRouter);
 
 
-// init redit connection
+// init redis connection
 connectRedis();
 
+// init socketIo connection
+initializeSocketIO(httpServer);
 
-app.listen(PORT, () => {
+
+
+httpServer.listen(PORT, () => {
     verifyConnections();
     console.log(`Server is running on port ${PORT}`);
 });

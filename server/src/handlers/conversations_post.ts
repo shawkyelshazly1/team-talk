@@ -3,6 +3,7 @@ import { getUser } from "../utils/authUtils";
 import { conversationRepo } from "../repos";
 
 import { Agent } from "../lib/types";
+import { conversationServices } from "../services";
 
 // create conversation by csr
 export const createConversation = async (req: Request, res: Response) => {
@@ -17,7 +18,7 @@ export const createConversation = async (req: Request, res: Response) => {
     }
 
     try {
-        const conversation = await conversationRepo.createConversation(user as Agent, ticketLink, message);
+        const conversation = await conversationServices.createNewConversation(user as Agent, ticketLink, message);
 
         res.status(200).json(conversation);
     } catch (error) {
@@ -40,8 +41,14 @@ export const setConversationStatus = async (req: Request, res: Response) => {
         return;
     }
 
+    if (user.role !== "teamleader") {
+        res.status(403).json({ message: "You are not authorized to change conversation status" });
+        return;
+    }
+
     try {
-        const conversation = await conversationRepo.setConversationStatus(conversationId, status, topic);
+
+        const conversation = await conversationServices.changeConversationStatus(conversationId, status, topic, user as Agent);
 
         res.status(200).json(conversation);
     } catch (error) {

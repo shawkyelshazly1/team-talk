@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { db } from "../db";
 import { redisClient } from "../redis/connection";
+import { socketIOClient } from "../socketio";
 
 export async function verifyConnections() {
     const connections = {
@@ -8,6 +9,7 @@ export async function verifyConnections() {
         Database: "❌",
         Server: "❌",
         Redis: "❌",
+        SocketIO: "❌",
     };
     // verify meilisearch connection
     await fetch(`${process.env.MEILI_HOST}/health`).then(res => {
@@ -46,6 +48,12 @@ export async function verifyConnections() {
         connections.Redis = "❌";
     });
 
+    // verify socketIO connections
+    if (socketIOClient) {
+        connections.SocketIO = "✅";
+    } else {
+        connections.SocketIO = "❌";
+    }
 
 
 
