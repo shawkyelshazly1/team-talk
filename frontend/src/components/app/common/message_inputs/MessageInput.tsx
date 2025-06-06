@@ -1,6 +1,5 @@
 "use client";
 import { Textarea } from "@/components/ui/textarea";
-import { useSelectedConversation } from "@/hooks/conversation";
 import { cn } from "@/lib/utils";
 import { SendHorizonal } from "lucide-react";
 import { useState } from "react";

@@ -1,5 +1,5 @@
 
-import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../axiosInstance";
 import toast from "react-hot-toast";
 import { Conversation } from "@/lib/types";
