@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { getUser } from "../utils/authUtils";
 import { conversationRepo } from "../repos";
 
-import { Agent } from "../lib/types";
+import { Agent, User } from "../lib/types";
 import { conversationServices } from "../services";
 
 // create conversation by csr
@@ -41,7 +41,10 @@ export const setConversationStatus = async (req: Request, res: Response) => {
         return;
     }
 
-    if (user.role !== "teamleader") {
+
+
+
+    if (user.role !== ("team_lead" as User["role"])) {
         res.status(403).json({ message: "You are not authorized to change conversation status" });
         return;
     }

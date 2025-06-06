@@ -12,21 +12,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateConversation } from "@/services/mutations/conversation";
-import { setSelectedConversation } from "@/stores/features/conversation/conversationSlice";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
 import { ClipLoader } from "react-spinners";
-import { useRouter } from "next/navigation";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 export default function NewConversationModal() {
 	const [ticketLink, setTicketLink] = useState("");
 	const [message, setMessage] = useState("");
 	const [open, setOpen] = useState(false);
+	const { setSelectedConversationId } = useConversationContext();
 
 	const queryClient = useQueryClient();
-	const dispatch = useDispatch();
 
 	const { mutate: createConversation, isPending } =
 		useCreateConversation(queryClient);
@@ -91,7 +89,7 @@ export default function NewConversationModal() {
 										onSuccess: (data) => {
 											clearState();
 											// set the conversation as selected in store
-											dispatch(setSelectedConversation(data.data.id));
+											setSelectedConversationId(data.data.id);
 
 											// set the conversation Id in the url
 											const params = new URLSearchParams(

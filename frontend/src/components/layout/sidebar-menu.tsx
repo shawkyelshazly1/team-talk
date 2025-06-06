@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/lib/auh/auth-client";
 import { ClipLoader } from "react-spinners";
+import { useUserContext } from "@/contexts/UserContext";
 
 // Team_lead Menu items.
 const team_lead_menu_items = [
@@ -31,18 +32,12 @@ const csr_menu_items = [
 	},
 ];
 export default function SidebarMenuLinks() {
-	const { data: session, isPending } = useSession();
+	const { user } = useUserContext();
 	const pathname = usePathname();
 
 	const menu_items =
-		session?.user.role === "csr" ? csr_menu_items : team_lead_menu_items;
+		user?.role === "csr" ? csr_menu_items : team_lead_menu_items;
 
-	if (isPending)
-		return (
-			<div className="flex items-center justify-center h-full">
-				<ClipLoader className="mx-auto" size={20} />;
-			</div>
-		);
 	return (
 		<SidebarMenu>
 			{menu_items.map((item) => (

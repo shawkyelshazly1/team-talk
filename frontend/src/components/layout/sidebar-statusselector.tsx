@@ -1,19 +1,14 @@
 "use client";
-import {
-	clearBasket,
-	selectUserStatus,
-	setUserStatus,
-} from "@/stores/features/user/userSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { setSelectedConversation } from "@/stores/features/conversation/conversationSlice";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUserContext } from "@/contexts/UserContext";
+import { useAppContext } from "@/contexts/AppContext";
 
 export default function SidebarStatusSelector() {
-	const dispatch = useDispatch();
-	const userStatus = useSelector(selectUserStatus);
-	const router = useRouter();
+	const { clearBasket } = useAppContext();
+	const { userStatus, setUserStatus } = useUserContext();
+	const { setSelectedConversationId } = useConversationContext();
 
 	const removeAllParamsFromUrl = () => {
 		const newUrl = `${window.location.pathname}`;
@@ -24,7 +19,7 @@ export default function SidebarStatusSelector() {
 		<>
 			<DropdownMenuItem
 				onClick={() => {
-					dispatch(setUserStatus({ status: "online" }));
+					setUserStatus("online");
 				}}
 				className={cn("cursor-pointer hover:bg-sidebar-accent p-0")}
 			>
@@ -40,9 +35,9 @@ export default function SidebarStatusSelector() {
 			</DropdownMenuItem>
 			<DropdownMenuItem
 				onClick={() => {
-					dispatch(setUserStatus({ status: "offline" }));
-					dispatch(clearBasket());
-					dispatch(setSelectedConversation(""));
+					setUserStatus("offline");
+					clearBasket();
+					setSelectedConversationId("");
 					// TODO: unassign conversations on server side
 					// remove all params from the url
 					removeAllParamsFromUrl();

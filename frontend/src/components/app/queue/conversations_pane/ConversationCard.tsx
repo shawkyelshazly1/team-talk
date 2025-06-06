@@ -4,9 +4,8 @@ import UserInfoAvatar from "../../common/cards/UserInfoAvatar";
 import { Conversation } from "@/lib/types";
 import moment from "moment";
 import { useSession } from "@/lib/auh/auth-client";
-import { useSelector } from "react-redux";
-import { selectSelectedConversation } from "@/stores/features/conversation/conversationSlice";
 import { cn } from "@/lib/utils";
+import { useConversationContext } from "@/contexts/ConversationContext";
 export default function ConversationCard({
 	conversation,
 }: {
@@ -22,7 +21,7 @@ export default function ConversationCard({
 		window.history.pushState({}, "", newUrl);
 	};
 
-	const selectedConversationId = useSelector(selectSelectedConversation);
+	const { selectedConversationId } = useConversationContext();
 
 	return (
 		<div className="flex flex-col gap-3">

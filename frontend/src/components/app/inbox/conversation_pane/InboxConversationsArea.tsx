@@ -5,10 +5,8 @@ import { Suspense, useEffect } from "react";
 import NewConversationModal from "./NewConversationModal";
 import InboxConversationsContainer from "./InboxConversationsContainer";
 import { Conversation } from "@/lib/types";
-import { setSelectedConversation } from "@/stores/features/conversation/conversationSlice";
-import { useDispatch } from "react-redux";
 import { Badge } from "@/components/ui/badge";
-import { useReadCache } from "@/services/readCache";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 export default function InboxConversationsArea() {
 	const statuses = [
@@ -18,16 +16,14 @@ export default function InboxConversationsArea() {
 		"closed",
 	] as Conversation["status"][];
 
-	const dispatch = useDispatch();
+	const { setSelectedConversationId } = useConversationContext();
 
 	// clear state when navigating to a different route
 	useEffect(() => {
 		return () => {
-			dispatch(setSelectedConversation(""));
+			setSelectedConversationId("");
 		};
 	}, []);
-
-	
 
 	return (
 		<div className="h-[100vh] flex-1 py-4 border-r border-border w-1/2 lg:w-1/3 px-1 justify-between flex flex-col gap-4">

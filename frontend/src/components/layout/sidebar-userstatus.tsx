@@ -1,12 +1,11 @@
 "use client";
 
-import { selectUserStatus } from "@/stores/features/user/userSlice";
 import { cn } from "@/lib/utils";
-import { useSelector } from "react-redux";
 import { useSidebar } from "../ui/sidebar";
+import { useUserContext } from "@/contexts/UserContext";
 
 export default function SidebarUserStatus() {
-	const userStatus = useSelector(selectUserStatus);
+	const { userStatus } = useUserContext();
 	const { state } = useSidebar();
 
 	return (

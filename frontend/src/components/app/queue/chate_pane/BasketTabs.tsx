@@ -1,20 +1,14 @@
 "use client";
 
-import { useSelector } from "react-redux";
-import { selectBasket } from "@/stores/features/user/userSlice";
-
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import { useAppContext } from "@/contexts/AppContext";
 
 export default function BasketTabs() {
-	const basket = useSelector(selectBasket);
-	// FIXME: redux state causing hydration issue due to SSR-ed component
-	// const selectedConversationId = useSelector(selectSelectedConversation);
+	const { basket } = useAppContext();
 
-	const searchParams = useSearchParams();
-
-	const selectedConversationId = searchParams.get("conversation_id");
+	const { selectedConversationId } = useConversationContext();
 
 	// set the conversation id in the url params
 	const setConversationIdInParams = (conversationId: string) => {

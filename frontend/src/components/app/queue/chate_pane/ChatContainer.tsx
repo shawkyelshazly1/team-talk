@@ -6,12 +6,12 @@ import MessagesSection from "../../common/sections/MessagesSection";
 import ChatHeader from "./ChatHeader";
 import { useLoadConversationById } from "@/services/queries/conversation";
 import { SyncLoader } from "react-spinners";
-import { useSearchParams } from "next/navigation";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 export default function ChatContainer() {
-	const searchParams = useSearchParams();
+	const { selectedConversationId } = useConversationContext();
 
-	const selectedConversationId = searchParams.get("conversation_id");
+	// load conversation by id from the server
 	const { data: conversation, isLoading: isConversationLoading } =
 		useLoadConversationById(selectedConversationId ?? "");
 

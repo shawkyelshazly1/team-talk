@@ -4,15 +4,14 @@ import InboxConversationCard from "./InboxConversationCard";
 import { useLoadInfiniteCsrConversations } from "@/services/queries/conversation";
 import { ClipLoader, SyncLoader } from "react-spinners";
 import { Conversation } from "@/lib/types";
-import { useSelector } from "react-redux";
-import { selectSelectedConversation } from "@/stores/features/conversation/conversationSlice";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 export default function InboxConversationsContainer({
 	status,
 }: {
 	status: Conversation["status"];
 }) {
-	const selectedConversation = useSelector(selectSelectedConversation);
+	const { selectedConversationId } = useConversationContext();
 
 	const {
 		data,
@@ -36,7 +35,7 @@ export default function InboxConversationsContainer({
 						<InboxConversationCard
 							key={conversation.id}
 							conversation={conversation}
-							selected={selectedConversation === conversation.id}
+							selected={selectedConversationId === conversation.id}
 						/>
 					))
 				)

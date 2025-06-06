@@ -1,19 +1,17 @@
 "use client";
 // import RichMessageInput from "./message_input/RichMessageInput";
-import { useSelector } from "react-redux";
-import {
-	selectBasket,
-	selectUserStatus,
-} from "@/stores/features/user/userSlice";
 import { SyncLoader } from "react-spinners";
 import BasketTabs from "./BasketTabs";
 import ChatContainer from "./ChatContainer";
 import { useEffect } from "react";
-import { selectSelectedConversation } from "@/stores/features/conversation/conversationSlice";
+import { useUserContext } from "@/contexts/UserContext";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import { useAppContext } from "@/contexts/AppContext";
+
 export default function ChatSection() {
-	const basket = useSelector(selectBasket);
-	const userStatus = useSelector(selectUserStatus);
-	const selectedConversation = useSelector(selectSelectedConversation);
+	const { basket } = useAppContext();
+	const { userStatus } = useUserContext();
+	const { selectedConversationId } = useConversationContext();
 
 	useEffect(() => {
 		// on first load, set the conversation id for 1st in basket in the url params
@@ -33,7 +31,7 @@ export default function ChatSection() {
 					<SyncLoader size={10} color="#000" />
 				</div>
 			) : (
-				selectedConversation !== "" && (
+				selectedConversationId !== "" && (
 					<>
 						<BasketTabs />
 						<ChatContainer />

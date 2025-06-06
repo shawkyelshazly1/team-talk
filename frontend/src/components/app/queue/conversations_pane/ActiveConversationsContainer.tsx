@@ -1,10 +1,11 @@
 "use client";
+import { useAppContext } from "@/contexts/AppContext";
 import ConversationCard from "./ConversationCard";
 import { selectBasket } from "@/stores/features/user/userSlice";
 import { useSelector } from "react-redux";
 
 export default function ActiveConversationsContainer() {
-	const basket = useSelector(selectBasket);
+	const { basket } = useAppContext();
 	let activeConversations = basket
 		// TODO: Remove this filter once we have the real data only active conversations are fetched
 		.filter((conversation) => conversation.status === "active")

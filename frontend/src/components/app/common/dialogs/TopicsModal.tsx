@@ -13,7 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSetConversationStatus } from "@/services/mutations/conversation";
 import { ClipLoader } from "react-spinners";
-import { useSelectedConversation } from "@/hooks/conversation";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 type TopicsModalProps = {
 	open: boolean;
@@ -28,12 +28,12 @@ export default function TopicsModal({
 	setStatus,
 	statusHolder,
 }: TopicsModalProps) {
-	const conversation = useSelectedConversation();
+	const { selectedConversation } = useConversationContext();
 
 	const queryClient = useQueryClient();
 
 	const [selectedTopic, setSelectedTopic] = useState<string>(
-		conversation?.topic ?? ""
+		selectedConversation?.topic ?? ""
 	);
 
 	const { mutate: setConversationStatus, isPending } =
@@ -57,10 +57,10 @@ export default function TopicsModal({
 					disabled={!selectedTopic || isPending}
 					className=" min-w-[150px] mx-auto cursor-pointer capitalize"
 					onClick={() => {
-						if (selectedTopic) {
+						if (selectedTopic && selectedConversation) {
 							setConversationStatus(
 								{
-									conversationId: conversation?.id,
+									conversationId: selectedConversation?.id!,
 									status: statusHolder as "solved" | "pending",
 									topic: selectedTopic,
 								},
