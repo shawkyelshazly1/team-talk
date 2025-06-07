@@ -10,7 +10,9 @@ export default function ReceivedMessage({ message }: { message: Message }) {
 					src={message.sender.image ?? ""}
 					alt="User avatar"
 				/>
-				<AvatarFallback>{message.sender.name?.charAt(0)}</AvatarFallback>
+				<AvatarFallback className="uppercase">
+					{message.sender.name?.charAt(0) + message.sender.name?.charAt(1)}
+				</AvatarFallback>
 			</Avatar>
 			<div className="flex flex-col gap-1">
 				<p className="text-sm font-medium capitalize">{message.sender.name}</p>

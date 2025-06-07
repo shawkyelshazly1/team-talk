@@ -161,3 +161,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Drizzle ORM](https://orm.drizzle.team/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [BetterAuth](https://better-auth.com/)
+
+## 🗺 Roadmap
+
+- [x] User status change
+- [ ] conversation assignment logic
+- [ ] realtime messaging

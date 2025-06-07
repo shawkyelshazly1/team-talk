@@ -18,10 +18,10 @@ export async function connectRedis() {
 
     redisClient.on("connect", async () => {
         // stablish keys
-        await createKey("users:online_teamleaders", "set");
+        await createKey("users:online_teamleaders", "hash");
         await createKey("users:online_agents", "set");
-        await createKey("conversations:in_queue", "json");
-        await createKey("conversations:messages", "json");
+        await createKey("conversations:queue", "list");
+        // await createKey("conversations:messages", "json");
         console.log("Redis connected");
     });
 }

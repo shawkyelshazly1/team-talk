@@ -12,8 +12,9 @@ export default function AgentInfoAvatar({
 			<div className="flex items-center gap-2">
 				<Avatar>
 					<AvatarImage src={conversation?.agent?.image ?? ""} />
-					<AvatarFallback>
-						{conversation?.agent?.name?.charAt(0)}
+					<AvatarFallback className="uppercase">
+						{conversation?.agent?.name?.charAt(0) +
+							conversation?.agent?.name?.charAt(1)}
 					</AvatarFallback>
 				</Avatar>
 				<div className="flex flex-col gap-0">

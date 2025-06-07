@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useSetConversationStatus } from "@/services/mutations/conversation";
 import { ClipLoader } from "react-spinners";
 import { useConversationContext } from "@/contexts/ConversationContext";
+import { useParams } from "next/navigation";
 
 type TopicsModalProps = {
 	open: boolean;
@@ -29,6 +30,10 @@ export default function TopicsModal({
 	statusHolder,
 }: TopicsModalProps) {
 	const { selectedConversation } = useConversationContext();
+	const params = useParams();
+	const conversationId = params.id as string;
+
+	console.log(selectedConversation);
 
 	const queryClient = useQueryClient();
 
@@ -57,10 +62,10 @@ export default function TopicsModal({
 					disabled={!selectedTopic || isPending}
 					className=" min-w-[150px] mx-auto cursor-pointer capitalize"
 					onClick={() => {
-						if (selectedTopic && selectedConversation) {
+						if (selectedTopic && (selectedConversation || conversationId)) {
 							setConversationStatus(
 								{
-									conversationId: selectedConversation?.id!,
+									conversationId: selectedConversation?.id || conversationId,
 									status: statusHolder as "solved" | "pending",
 									topic: selectedTopic,
 								},

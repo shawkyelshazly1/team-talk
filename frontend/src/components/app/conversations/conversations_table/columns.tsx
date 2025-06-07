@@ -33,7 +33,7 @@ export const columns: ColumnDef<Conversation>[] = [
 				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
 					<Avatar className="w-8 h-8 ring-2 ring-blue-300">
 						<AvatarImage src={row.original.agent.image ?? ""} />
-						<AvatarFallback className="bg-blue-300 text-white capitalize">
+						<AvatarFallback className="bg-blue-300 text-white uppercase">
 							{row.original.agent.name.charAt(0) +
 								row.original.agent.name.charAt(1)}
 						</AvatarFallback>
@@ -51,7 +51,7 @@ export const columns: ColumnDef<Conversation>[] = [
 				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
 					<Avatar className="w-8 h-8 ring-2 ring-blue-300">
 						<AvatarImage src={row.original.assignee?.image ?? ""} />
-						<AvatarFallback className="bg-blue-300 text-white capitalize">
+						<AvatarFallback className="bg-blue-300 text-white uppercase">
 							{row.original.assignee?.name?.charAt(0) +
 								row.original.assignee?.name?.charAt(1)}
 						</AvatarFallback>
@@ -84,7 +84,7 @@ export const columns: ColumnDef<Conversation>[] = [
 										)}
 									>
 										<AvatarImage src={tl?.image ?? ""} />
-										<AvatarFallback className="bg-blue-500 text-white capitalize">
+										<AvatarFallback className="bg-blue-500 text-white uppercase">
 											{tl.name.charAt(0) + tl.name.charAt(1)}
 										</AvatarFallback>
 									</Avatar>
@@ -103,7 +103,7 @@ export const columns: ColumnDef<Conversation>[] = [
 									)}
 								>
 									<AvatarImage src={tl?.image ?? ""} />
-									<AvatarFallback className="bg-blue-300 text-white capitalize">
+									<AvatarFallback className="bg-blue-300 text-white uppercase">
 										{tl.name.charAt(0) + tl.name.charAt(1)}
 									</AvatarFallback>
 								</Avatar>
@@ -115,7 +115,7 @@ export const columns: ColumnDef<Conversation>[] = [
 							<div key={tl.id} className="flex flex-row items-center gap-2">
 								<Avatar>
 									<AvatarImage src={tl?.image ?? ""} />
-									<AvatarFallback className="bg-blue-300 text-white capitalize">
+									<AvatarFallback className="bg-blue-300 text-white uppercase">
 										{tl.name.charAt(0) + tl.name.charAt(1)}
 									</AvatarFallback>
 								</Avatar>

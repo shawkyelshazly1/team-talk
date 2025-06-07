@@ -1,12 +1,11 @@
 import { Server } from "socket.io";
-import { Server as HttpServer } from 'http';
+import { Server as HttpServer } from "http";
 import { registerListeners } from "./listeners";
 import { registerUserDisconnectionListeners } from "./listeners/user";
-import { ExtendedSocket } from "./types";
-
+import type { ClientToServerEvents, SocketData, ExtendedSocket, ServerToClientEvents } from "./types";
 
 // socketio client instance
-export let socketIOClient: Server;
+export let socketIOClient: Server<ClientToServerEvents, ServerToClientEvents, SocketData>;
 
 // initialize socketio
 export const initializeSocketIO = (httpServer: HttpServer) => {
@@ -20,13 +19,14 @@ export const initializeSocketIO = (httpServer: HttpServer) => {
     // initialize listeners
     socketIOClient.on("connection", (socket: ExtendedSocket) => {
         registerListeners(socket);
-    });
 
-    // regiser disconnecting event
-    socketIOClient.on("disconnect", (socket: ExtendedSocket) => {
-        registerUserDisconnectionListeners(socket);
+        socket.on("error", (error) => {
+            console.log("socket error: ", error);
+        });
+
+        // regiser disconnecting event
+        socket.on("disconnect", () => {
+            registerUserDisconnectionListeners(socket);
+        });
     });
 };
-
-
-

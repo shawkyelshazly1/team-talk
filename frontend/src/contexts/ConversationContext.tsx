@@ -1,6 +1,11 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+	useParams,
+	usePathname,
+	useRouter,
+	useSearchParams,
+} from "next/navigation";
 import {
 	createContext,
 	ReactNode,
@@ -11,6 +16,7 @@ import {
 import { useUserContext } from "./UserContext";
 import { Conversation } from "@/lib/types";
 import { useQueryClient } from "@tanstack/react-query";
+import { useReadCache } from "@/services/use-read-cache";
 
 export const ConversationContext = createContext<{
 	selectedConversationId: string;
@@ -25,6 +31,10 @@ export const ConversationContext = createContext<{
 });
 
 export const ConversationProvider = ({ children }: { children: ReactNode }) => {
+	const params = useParams();
+	const conversationId = params.id as string;
+	const { readConversation } = useReadCache();
+
 	const [selectedConversationId, setSelectedConversationId] =
 		useState<string>("");
 	const [selectedConversation, setSelectedConversation] =
@@ -42,6 +52,19 @@ export const ConversationProvider = ({ children }: { children: ReactNode }) => {
 			setSelectedConversationId(conversationId);
 		}
 	}, [searchParams.get("conversation_id")]);
+
+	useEffect(() => {
+		if (conversationId) {
+			const conversation = readConversation(conversationId);
+			setSelectedConversation(conversation!);
+		}
+	}, [conversationId]);
+
+	useEffect(() => {
+		if (userStatus === "offline" && selectedConversationId !== "") {
+			setSelectedConversationId("");
+		}
+	}, [userStatus]);
 
 	useEffect(() => {
 		if (

@@ -15,7 +15,7 @@ export default function ChatContainer() {
 	const { data: conversation, isLoading: isConversationLoading } =
 		useLoadConversationById(selectedConversationId ?? "");
 
-	return isConversationLoading ? (
+	return isConversationLoading || !conversation ? (
 		<div className="flex justify-center items-center h-full">
 			<SyncLoader size={10} color="#000" />
 		</div>
@@ -26,7 +26,9 @@ export default function ChatContainer() {
 				<MessagesSection conversation={conversation!} />
 			</Suspense>
 			<Suspense fallback={<h1>loading</h1>}>
-				<MessageInput conversation={conversation!} />
+				{conversation && conversation.status !== "closed" && (
+					<MessageInput conversation={conversation!} />
+				)}
 				{/* <RichMessageInput /> */}
 			</Suspense>
 			<p className="text-xs text-muted-foreground text-center">

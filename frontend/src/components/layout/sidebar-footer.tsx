@@ -35,7 +35,9 @@ export default async function SidebarUserFooter() {
 								<div className="relative ">
 									<Avatar className="h-8 w-8 rounded-lg">
 										<AvatarImage src={user.image ?? ""} alt={user.name} />
-										<AvatarFallback className="rounded-lg">CN</AvatarFallback>
+										<AvatarFallback className="rounded-lg uppercase">
+											{user.name?.charAt(0) + user.name?.charAt(1)}
+										</AvatarFallback>
 									</Avatar>
 									{/* Status Indicator */}
 									{user?.role === "team_lead" && <SidebarUserStatus />}
@@ -57,7 +59,9 @@ export default async function SidebarUserFooter() {
 								<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 									<Avatar className="h-8 w-8 rounded-lg">
 										<AvatarImage src={user.image ?? ""} alt={user.name} />
-										<AvatarFallback className="rounded-lg">CN</AvatarFallback>
+										<AvatarFallback className="rounded-lg uppercase">
+											{user.name?.charAt(0) + user.name?.charAt(1)}
+										</AvatarFallback>
 									</Avatar>
 									<div className="grid flex-1 text-left text-sm leading-tight">
 										<span className="truncate font-semibold">{user.name}</span>

@@ -1,72 +1,110 @@
 "use client";
 import { ExtendedSocket } from "@/lib/socketio/types";
 import { Conversation } from "@/lib/types";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+	createContext,
+	ReactNode,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
+import { useUserContext } from "./UserContext";
+import { io } from "socket.io-client";
+import toast from "react-hot-toast";
 
 interface AppContextType {
 	socket: ExtendedSocket | null;
 	basket: Conversation[];
 	isConnected: boolean;
 	addToBasket: (conversation: Conversation) => void;
-	removeFromBasket: (conversation: Conversation) => void;
+	removeFromBasket: (conversationId: string) => void;
 	clearBasket: () => void;
+	updateConversation: (conversation: Omit<Conversation, "agent">) => void;
 }
 
 export const AppContext = createContext<AppContextType>({
 	socket: null,
-	// TODO: remove this
 	basket: [],
 	isConnected: false,
 	addToBasket: () => {},
 	removeFromBasket: () => {},
 	clearBasket: () => {},
+	updateConversation: () => {},
 });
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
+	const { user } = useUserContext();
 	const [socket, setSocket] = useState<ExtendedSocket | null>(null);
-	const [basket, setBasket] = useState<Conversation[]>([
-		{
-			createdAt: "2025-05-17 22:26:20.651913",
-			id: "conv1",
-			status: "pending",
-			topic: "",
-			updatedAt: "2025-05-17 22:26:20.651913",
-			agent: {
-				id: "mYc6kaHzqWMuTe9Y59BtHaEpjMrbCqpO",
-				name: "shawky ahmed",
-				email: "shawkyelshazly1@gmail.com",
-				image:
-					"https://lh3.googleusercontent.com/a/ACg8ocLmefYfn78jB0Sz0F1uoFKFQxJFStj8hH_RzXYk7eFojefGtw=s96-c",
-				role: "csr",
-			},
-		},
-		{
-			createdAt: "2025-05-24 17:00:57.151997",
-			id: "4abb8a34-d12c-49fb-8aa0-8c911ddcd9d0",
-			status: "active",
-			topic: "",
-			updatedAt: "2025-05-24 17:00:57.151997",
-			agent: {
-				id: "mYc6kaHzqWMuTe9Y59BtHaEpjMrbCqpO",
-				name: "shawky ahmed",
-				email: "shawkyelshazly1@gmail.com",
-				image:
-					"https://lh3.googleusercontent.com/a/ACg8ocLmefYfn78jB0Sz0F1uoFKFQxJFStj8hH_RzXYk7eFojefGtw=s96-c",
-				role: "csr",
-			},
-		},
-	]);
+
+	const [basket, setBasket] = useState<Conversation[]>([]);
 	const [isConnected, setIsConnected] = useState(false);
 
 	const addToBasket = (conversation: Conversation) => {
 		setBasket((prev) => [...prev, conversation]);
 	};
-	const removeFromBasket = (conversation: Conversation) => {
-		setBasket((prev) => prev.filter((c) => c.id !== conversation.id));
+	const removeFromBasket = (conversationId: string) => {
+		setBasket((prev) => prev.filter((c) => c.id !== conversationId));
 	};
 	const clearBasket = () => {
 		setBasket([]);
 	};
+
+	const updateConversation = (conversation: Omit<Conversation, "agent">) => {
+		setBasket((prev) =>
+			prev.map((c) =>
+				c.id === conversation.id ? { ...c, ...conversation } : c
+			)
+		);
+	};
+
+	useEffect(() => {
+		if (user && !socket) {
+			const toastId = toast.loading("Connecting to server...");
+
+			const newSocket = io(process.env.NEXT_PUBLIC_WS_URL, {
+				timeout: 10000,
+				autoConnect: true,
+			});
+
+			newSocket.on("connect", () => {
+				// Emit authenticate event with user data
+				newSocket.emit("authenticate", { user });
+			});
+
+			newSocket.on("authenticated", () => {
+				setIsConnected(true);
+				setSocket(newSocket);
+				toast.success("Connected", { id: toastId });
+			});
+
+			newSocket.on("unauthorized", () => {
+				setIsConnected(false);
+				setSocket(null);
+				toast.error("Authentication failed", { id: toastId });
+			});
+
+			newSocket.on("disconnect", () => {
+				setIsConnected(false);
+				setSocket(null);
+				if (user) {
+					toast.loading("Reconnecting...", { id: toastId });
+				} else {
+					toast.error("Disconnected", { id: toastId });
+				}
+			});
+
+			return () => {
+				newSocket.disconnect();
+				setSocket(null);
+				setIsConnected(false);
+			};
+		} else {
+			if (socket) {
+				socket.disconnect();
+			}
+			toast.dismiss();
+		}
+	}, [user]);
 
 	return (
 		<AppContext.Provider
@@ -77,6 +115,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 				addToBasket,
 				removeFromBasket,
 				clearBasket,
+				updateConversation,
 			}}
 		>
 			{children}

@@ -5,6 +5,7 @@ import MessagesSection from "../../common/sections/MessagesSection";
 import MessageInput from "../../common/message_inputs/MessageInput";
 import { useSearchParams } from "next/navigation";
 import { useLoadConversationById } from "@/services/queries/conversation";
+import { useConversationSocket } from "@/hooks/use-conversation-socket";
 
 export default function InboxChatSection() {
 	const searchParams = useSearchParams();
@@ -13,14 +14,20 @@ export default function InboxChatSection() {
 
 	const { data: conversation } = useLoadConversationById(conversationId ?? "");
 
-	return conversationId ? (
+	useConversationSocket({
+		conversationId: conversationId!,
+	});
+
+	return conversationId && conversation ? (
 		<div className="  h-[100vh] py-4 w-1/2 lg:w-2/3 px-2 gap-2 flex flex-col">
 			<InboxChatHeader conversation={conversation!} />
 			<Suspense fallback={<h1>loading</h1>}>
 				<MessagesSection conversation={conversation!} />
 			</Suspense>
 			<Suspense fallback={<h1>loading</h1>}>
-				<MessageInput conversation={conversation!} />
+				{conversation && conversation.status !== "closed" ? (
+					<MessageInput conversation={conversation!} />
+				) : null}
 				{/* <RichMessageInput /> */}
 			</Suspense>
 			<p className="text-xs text-muted-foreground text-center">

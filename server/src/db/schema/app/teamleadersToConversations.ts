@@ -4,7 +4,7 @@ import { user } from "../auth/user";
 import { relations } from "drizzle-orm";
 
 export const teamleadersOnConversations = pgTable("conversation_participants", {
-    conversationId: text("conversation_id").notNull().references(() => conversation.id),
+    conversationId: text("conversation_id").notNull().references(() => conversation.id, { onDelete: "cascade" }),
     teamleaderId: text("teamleader_id").notNull().references(() => user.id)
 }, (t) => [
     primaryKey({ columns: [t.conversationId, t.teamleaderId] })

@@ -4,22 +4,34 @@ import { cn } from "@/lib/utils";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { useUserContext } from "@/contexts/UserContext";
 import { useAppContext } from "@/contexts/AppContext";
+import { UserStatus } from "@/lib/types";
+import { useSocket } from "@/hooks/use-socket";
+import toast from "react-hot-toast";
 
 export default function SidebarStatusSelector() {
 	const { clearBasket } = useAppContext();
-	const { userStatus, setUserStatus } = useUserContext();
+	const { userStatus } = useUserContext();
 	const { setSelectedConversationId } = useConversationContext();
+	const { socket, isConnected } = useSocket();
 
 	const removeAllParamsFromUrl = () => {
 		const newUrl = `${window.location.pathname}`;
 		window.history.pushState({}, "", newUrl);
 	};
 
+	const handleSetStatus = (status: UserStatus) => {
+		if (socket && isConnected) {
+			socket.emit("set_status", { status });
+		} else {
+			toast.error("Failed to set status");
+		}
+	};
+
 	return (
 		<>
 			<DropdownMenuItem
 				onClick={() => {
-					setUserStatus("online");
+					handleSetStatus("online");
 				}}
 				className={cn("cursor-pointer hover:bg-sidebar-accent p-0")}
 			>
@@ -35,12 +47,12 @@ export default function SidebarStatusSelector() {
 			</DropdownMenuItem>
 			<DropdownMenuItem
 				onClick={() => {
-					setUserStatus("offline");
-					clearBasket();
-					setSelectedConversationId("");
+					handleSetStatus("offline");
 					// TODO: unassign conversations on server side
+					// clearBasket();
+					// setSelectedConversationId("");
 					// remove all params from the url
-					removeAllParamsFromUrl();
+					// removeAllParamsFromUrl();
 				}}
 				className={cn("cursor-pointer hover:bg-sidebar-accent p-0")}
 			>

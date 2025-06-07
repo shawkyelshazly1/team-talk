@@ -17,6 +17,9 @@ import {
     Conversation,
 } from "../lib/types";
 import { meilisearchQueries } from "../meilisearch";
+import { socketIOClient } from "../socketio";
+import { triggerQueueAssignment } from "../services/queueAssignment";
+import { redisUtils } from "../redis";
 
 // load csr conversations from DB by
 export const loadCsrConversations = async (
@@ -632,11 +635,59 @@ export const setConversationStatus = async (conversationId: string, status: (typ
         const updatedConversation = await db.update(conversation).set({ status, topic }).where(and(eq(conversation.id, conversationId), not(eq(conversation.status, "closed")), eq(conversation.assigneeId, user.id))).returning();
 
 
+
         if (updatedConversation.length === 0) {
             throw new Error("Conversation not found, already closed, or you don't have permission to update it");
         }
 
+
+
         return updatedConversation[0];
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// assign conversation to teamleader
+export const assignToTeamleader = async <T extends Conversation>(
+    conversationId: string, teamleaderId: string
+): Promise<T> => {
+    try {
+        await db.update(conversation).set({ assigneeId: teamleaderId }).where(eq(conversation.id, conversationId));
+
+        // add to participants
+        await db.insert(teamleadersOnConversations).values({
+            conversationId,
+            teamleaderId,
+        }).onConflictDoNothing();
+
+        const updatedConversation = await loadConversationById(conversationId);
+
+        if (!updatedConversation) {
+            throw new Error("Conversation not found");
+        }
+
+        return updatedConversation as T;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// unassign conversation from teamleader
+export const unassignFromTeamleader = async (conversationId: string): Promise<string> => {
+    ;
+    try {
+        const updatedConversation = await db.update(conversation).set({ assigneeId: null }).where(and(eq(conversation.id, conversationId), eq(conversation.status, 'active'))).returning();
+
+        if (updatedConversation.length === 0) {
+            throw new Error("Conversation not found");
+        }
+
+        return updatedConversation[0].id;
 
     } catch (error) {
         console.error(error);

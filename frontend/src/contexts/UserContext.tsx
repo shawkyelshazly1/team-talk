@@ -8,6 +8,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import { useAppContext } from "./AppContext";
 
 export const UserContext = createContext<{
 	user: User | null;
@@ -24,7 +25,6 @@ export const UserContext = createContext<{
 export const UserProvider = ({ children }: { children: ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
 	const [userStatus, setUserStatus] = useState<"online" | "offline">("offline");
-
 	const { data: session } = useSession();
 
 	useEffect(() => {
