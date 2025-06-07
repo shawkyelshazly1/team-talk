@@ -2,7 +2,8 @@
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../axiosInstance";
 import toast from "react-hot-toast";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
+
 
 
 

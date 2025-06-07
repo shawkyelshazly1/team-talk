@@ -10,7 +10,7 @@ import {
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import StatusBagde from "../../common/badges/StatusBagde";
 import moment from "moment";
 

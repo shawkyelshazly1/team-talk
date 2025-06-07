@@ -1,5 +1,5 @@
 "use client";
-import { ConversationSearchResults, Message } from "@/lib/types";
+import type { ConversationSearchResults } from "@shared/types";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Highlighter from "react-highlight-words";

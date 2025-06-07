@@ -1,4 +1,4 @@
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import StatusBagde from "../../common/badges/StatusBagde";
 import OpenTicketButton from "../../queue/chate_pane/buttons/OpenTicketButton";
 export default function InboxChatHeader({

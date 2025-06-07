@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { useUserContext } from "@/contexts/UserContext";
 import { useAppContext } from "@/contexts/AppContext";
-import { UserStatus } from "@/lib/types";
+import type { UserStatus } from "@shared/types";
 import { useSocket } from "@/hooks/use-socket";
 import toast from "react-hot-toast";
 

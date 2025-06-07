@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import moment from "moment";
 import { useSession } from "@/lib/auh/auth-client";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,7 @@ export default function InboxConversationCard({
 		window.history.pushState({}, "", newUrl);
 	};
 
-	const {  selectedConversationId } = useConversationContext();
+	const { selectedConversationId } = useConversationContext();
 
 	return (
 		<div className="flex flex-col gap-3">

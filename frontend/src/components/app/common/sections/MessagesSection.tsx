@@ -6,7 +6,7 @@ import EventMessage from "../messages/EventMessage";
 import SentMessage from "../messages/SentMessage";
 import ReceivedMessage from "../messages/ReceivedMessage";
 import { useLoadConversationMessagesById } from "@/services/queries/conversation";
-import { Conversation, Message } from "@/lib/types";
+import type { Conversation, Message } from "@shared/types";
 import { useSession } from "@/lib/auh/auth-client";
 import { ClipLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";

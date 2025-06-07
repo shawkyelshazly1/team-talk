@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Suspense, useEffect } from "react";
 import NewConversationModal from "./NewConversationModal";
 import InboxConversationsContainer from "./InboxConversationsContainer";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import { Badge } from "@/components/ui/badge";
 import { useConversationContext } from "@/contexts/ConversationContext";
 

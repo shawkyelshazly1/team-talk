@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import InboxConversationCard from "./InboxConversationCard";
 import { useLoadInfiniteCsrConversations } from "@/services/queries/conversation";
 import { ClipLoader, SyncLoader } from "react-spinners";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 export default function InboxConversationsContainer({

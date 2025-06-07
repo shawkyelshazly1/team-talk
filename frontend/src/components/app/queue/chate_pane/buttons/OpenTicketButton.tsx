@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 
 export default function OpenTicketButton({
 	conversation,

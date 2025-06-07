@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { SendHorizonal } from "lucide-react";
 import { useState } from "react";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import { useConversationSocket } from "@/hooks/use-conversation-socket";
 export default function MessageInput({
 	conversation,

@@ -1,4 +1,4 @@
-import { Agent, Conversation } from "../lib/types";
+import type { Agent, Conversation } from "@shared/types";
 import { meilisearchMutations } from "../meilisearch";
 import { conversationRepo } from "../repos";
 import { redisUtils } from "../redis";

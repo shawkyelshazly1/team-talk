@@ -1,5 +1,5 @@
 import { meilisearch } from "../lib/meilisearch";
-import { Message } from "../lib/types";
+import type { Message } from "@shared/types";
 
 // add single message to meilisearch
 export const addMessageToMeilisearch = async (message: Message) => {

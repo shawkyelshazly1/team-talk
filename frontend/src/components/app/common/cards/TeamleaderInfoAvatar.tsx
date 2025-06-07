@@ -1,6 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TeamLeader } from "@/lib/types";
+import type { TeamLeader } from "@shared/types";
 
 export default function TeamleaderInfoAvatar({
 	teamleader,

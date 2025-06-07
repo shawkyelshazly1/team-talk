@@ -14,7 +14,7 @@ import {
 	useState,
 } from "react";
 import { useUserContext } from "./UserContext";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useReadCache } from "@/services/use-read-cache";
 

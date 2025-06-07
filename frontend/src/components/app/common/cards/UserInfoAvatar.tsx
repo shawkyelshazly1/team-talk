@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "@/lib/types";
+import type { User } from "@shared/types";
 
 export default function UserInfoAvatar({ user }: { user: User }) {
 	return (

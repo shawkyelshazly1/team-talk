@@ -9,7 +9,7 @@ import MessagesSection from "../common/sections/MessagesSection";
 import MessageInput from "../common/message_inputs/MessageInput";
 import { useConversationSocket } from "@/hooks/use-conversation-socket";
 import { useUserContext } from "@/contexts/UserContext";
-import { User } from "@/lib/types";
+import type { User } from "@shared/types";
 
 export default function ConversationContainer({
 	conversationId,

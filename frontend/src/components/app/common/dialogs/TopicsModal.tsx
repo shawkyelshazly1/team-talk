@@ -8,7 +8,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import SelectTopicMenu from "../menus/SelectTopicMenu";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSetConversationStatus } from "@/services/mutations/conversation";

@@ -1,5 +1,5 @@
 "use client";
-import { ConversationSearchResults, User } from "@/lib/types";
+import type { ConversationSearchResults } from "@shared/types";
 
 import moment from "moment";
 import MessageResult from "./MessageResult";

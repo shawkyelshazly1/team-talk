@@ -15,7 +15,8 @@ import {
     TeamLeader,
     User,
     Conversation,
-} from "../lib/types";
+} from "@shared/types";
+
 import { meilisearchQueries } from "../meilisearch";
 import { socketIOClient } from "../socketio";
 import { triggerQueueAssignment } from "../services/queueAssignment";

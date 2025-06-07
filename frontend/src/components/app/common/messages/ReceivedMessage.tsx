@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Message } from "@/lib/types";
+import type { Message } from "@shared/types";
 
 export default function ReceivedMessage({ message }: { message: Message }) {
 	return (

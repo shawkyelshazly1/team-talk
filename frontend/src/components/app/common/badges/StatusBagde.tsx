@@ -1,6 +1,6 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import { cn } from "@/lib/utils";
 
 interface StatusBagdeProps {

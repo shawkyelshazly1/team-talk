@@ -1,6 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 
 export default function AgentInfoAvatar({
 	conversation,

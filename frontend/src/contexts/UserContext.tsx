@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "@/lib/auh/auth-client";
-import { User } from "@/lib/types";
+import type { User } from "@shared/types";
 import {
 	createContext,
 	ReactNode,

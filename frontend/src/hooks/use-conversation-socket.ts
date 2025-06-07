@@ -1,6 +1,6 @@
 import { useSocket } from "./use-socket";
 import { useCallback, useEffect } from "react";
-import { Message } from "@/lib/types";
+import type { Message } from "@shared/types";
 import { useUpdateCache } from "@/services/use-update-cache";
 
 

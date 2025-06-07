@@ -1,5 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Message } from "@/lib/types";
+import type { Message } from "@shared/types";
 import moment from "moment";
 
 export default function SentMessage({ message }: { message: Message }) {

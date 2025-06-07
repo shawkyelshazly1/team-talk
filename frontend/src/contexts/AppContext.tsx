@@ -1,6 +1,6 @@
 "use client";
 import { ExtendedSocket } from "@/lib/socketio/types";
-import { Conversation } from "@/lib/types";
+import type { Conversation } from "@shared/types";
 import {
 	createContext,
 	ReactNode,

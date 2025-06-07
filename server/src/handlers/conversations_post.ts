@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { getUser } from "../utils/authUtils";
-import { conversationRepo } from "../repos";
+import type { Agent, User } from "@shared/types";
 
-import { Agent, User } from "../lib/types";
 import { conversationServices } from "../services";
 
 // create conversation by csr

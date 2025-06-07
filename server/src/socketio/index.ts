@@ -2,7 +2,8 @@ import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import { registerListeners } from "./listeners";
 import { registerUserDisconnectionListeners } from "./listeners/user";
-import type { ClientToServerEvents, SocketData, ExtendedSocket, ServerToClientEvents } from "./types";
+import type { ClientToServerEvents, SocketData, ServerToClientEvents } from "@shared/socket-types";
+import type { ExtendedSocket } from "./types";
 
 // socketio client instance
 export let socketIOClient: Server<ClientToServerEvents, ServerToClientEvents, SocketData>;

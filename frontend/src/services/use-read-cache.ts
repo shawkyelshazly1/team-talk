@@ -1,6 +1,6 @@
 'use client';
 
-import { Conversation, Message } from "@/lib/types";
+import type { Conversation, Message } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 export function useReadCache() {
     const queryClient = useQueryClient();

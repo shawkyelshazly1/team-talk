@@ -2,7 +2,7 @@ import SubmitAsButton from "./buttons/SubmitAsButton";
 import OpenTicketButton from "./buttons/OpenTicketButton";
 import StatusBagde from "../../common/badges/StatusBagde";
 import AgentInfoAvatar from "../../common/cards/AgentInfoAvatar";
-import { Conversation, User } from "@/lib/types";
+import type { Conversation, User } from "@shared/types";
 import { useSession } from "@/lib/auh/auth-client";
 import TeamleaderInfoAvatar from "../../common/cards/TeamleaderInfoAvatar";
 

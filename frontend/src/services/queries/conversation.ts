@@ -1,4 +1,4 @@
-import { Conversation, ConversationSearchResults, Message } from "@/lib/types";
+import type { Conversation, ConversationSearchResults, Message } from "@shared/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../axiosInstance";
 
