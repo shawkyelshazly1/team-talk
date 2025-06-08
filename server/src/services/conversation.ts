@@ -48,7 +48,7 @@ export const changeConversationStatus = async (conversationId: string, status: (
             // remove conversation from basket
             redisUtils.removeConversationFromBasket(conversationId, conversation?.assigneeId ?? "");
             triggerQueueAssignment();
-        }, 7000);
+        }, 10000);
 
         return conversation;
 
@@ -88,8 +88,8 @@ export const assignConversationToTeamleader = async (): Promise<boolean> => {
             // assign conversation to teamleader
             await redisUtils.assignConversationToTeamleader(conversationId, bestTl);
 
-            // TODO: send conversation to teamleader basket
-            socketIOClient.to(bestTl).emit("assign_conversation", {
+            // FIXME: send conversation to teamleader basket
+            socketIOClient.to(`user_${bestTl}`).emit("assign_conversation", {
                 conversation: updatedConversation,
             });
 

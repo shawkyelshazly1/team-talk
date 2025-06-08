@@ -6,10 +6,10 @@ import MessagesSection from "../../common/sections/MessagesSection";
 import ChatHeader from "./ChatHeader";
 import { useLoadConversationById } from "@/services/queries/conversation";
 import { SyncLoader } from "react-spinners";
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUIStore } from "@/stores/useUIStore";
 
 export default function ChatContainer() {
-	const { selectedConversationId } = useConversationContext();
+	const { selectedConversationId } = useUIStore();
 
 	// load conversation by id from the server
 	const { data: conversation, isLoading: isConversationLoading } =

@@ -1,7 +1,6 @@
+import { sendMessage } from "@/services/socketService";
 import { useSocket } from "./use-socket";
-import { useCallback, useEffect } from "react";
-import type { Message } from "@shared/types";
-import { useUpdateCache } from "@/services/use-update-cache";
+import { useCallback } from "react";
 
 
 
@@ -10,40 +9,19 @@ interface ConversationSocketProps {
 }
 
 export const useConversationSocket = ({ conversationId }: ConversationSocketProps) => {
-    const { socket, isConnected } = useSocket();
-    const { updateMessage } = useUpdateCache();
-
-    const handleNewMessage = useCallback((data: { message: Message, conversation_id: string; }) => {
-        updateMessage(data); // Call the hook with the data
-    }, []);
-
-    // handle real-time events
-    useEffect(() => {
-        if (!socket || !isConnected || !conversationId) return;
-
-        // join conversation room
-        socket.emit("join_conversation", { conversation_id: conversationId });
-
-        // receive new message
-        socket.on("new_message", handleNewMessage);
+    const { socket } = useSocket();
 
 
+    // Room joining/leaving is now handled by useConversationRooms
+    // This hook only handles message sending
 
-        // leave conversation room
-        return () => {
-            socket.off("new_message", handleNewMessage);
-            socket.emit("leave_conversation", { conversation_id: conversationId });
-        };
-
-    }, [socket, isConnected, conversationId]);
-
-
-    const sendMessage = useCallback((message: string, conversation_id: string) => {
-        socket?.emit("new_message", { message, conversation_id });
+    const handleSendMessage = useCallback((message: string) => {
+        if (socket && conversationId) {
+            sendMessage(socket, message, conversationId);
+        }
     }, [socket, conversationId]);
 
-
-    return { sendMessage };
+    return { sendMessage: handleSendMessage };
 };
 
 

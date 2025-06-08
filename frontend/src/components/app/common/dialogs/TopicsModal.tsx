@@ -13,8 +13,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSetConversationStatus } from "@/services/mutations/conversation";
 import { ClipLoader } from "react-spinners";
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUIStore } from "@/stores/useUIStore";
 import { useParams } from "next/navigation";
+import { useLoadConversationById } from "@/services/queries/conversation";
 
 type TopicsModalProps = {
 	open: boolean;
@@ -29,11 +30,14 @@ export default function TopicsModal({
 	setStatus,
 	statusHolder,
 }: TopicsModalProps) {
-	const { selectedConversation } = useConversationContext();
+	const { selectedConversationId } = useUIStore();
 	const params = useParams();
 	const conversationId = params.id as string;
 
-	console.log(selectedConversation);
+	// Get conversation data from React Query cache
+	const { data: selectedConversation } = useLoadConversationById(
+		selectedConversationId || conversationId
+	);
 
 	const queryClient = useQueryClient();
 
@@ -62,7 +66,7 @@ export default function TopicsModal({
 					disabled={!selectedTopic || isPending}
 					className=" min-w-[150px] mx-auto cursor-pointer capitalize"
 					onClick={() => {
-						if (selectedTopic && (selectedConversation || conversationId)) {
+						if (selectedTopic && (selectedConversation?.id || conversationId)) {
 							setConversationStatus(
 								{
 									conversationId: selectedConversation?.id || conversationId,

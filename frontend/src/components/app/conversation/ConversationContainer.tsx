@@ -8,8 +8,8 @@ import ChatHeader from "../queue/chate_pane/ChatHeader";
 import MessagesSection from "../common/sections/MessagesSection";
 import MessageInput from "../common/message_inputs/MessageInput";
 import { useConversationSocket } from "@/hooks/use-conversation-socket";
-import { useUserContext } from "@/contexts/UserContext";
 import type { User } from "@shared/types";
+import { useUserStore } from "@/stores/useUserStore";
 
 export default function ConversationContainer({
 	conversationId,
@@ -19,7 +19,7 @@ export default function ConversationContainer({
 	const { data: conversation, isLoading: isConversationLoading } =
 		useLoadConversationById(conversationId ?? "");
 
-	const { user } = useUserContext();
+	const { user } = useUserStore();
 
 	useConversationSocket({
 		conversationId:

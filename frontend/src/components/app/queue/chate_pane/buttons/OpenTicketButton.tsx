@@ -9,13 +9,17 @@ export default function OpenTicketButton({
 	conversation: Conversation;
 }) {
 	return conversation?.ticketLink ? (
-		<Button
-			variant="default"
-			className="bg-blue-500 font-medium hover:bg-blue-600"
+		<Link
+			href={conversation?.ticketLink}
+			target="_blank"
+			className="cursor-pointer"
 		>
-			<Link href={conversation?.ticketLink} target="_blank">
+			<Button
+				variant="default"
+				className="bg-blue-500 font-medium hover:bg-blue-600 cursor-pointer" 
+			>
 				Open Ticket
-			</Link>
-		</Button>
+			</Button>
+		</Link>
 	) : null;
 }

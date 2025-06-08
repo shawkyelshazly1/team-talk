@@ -2,13 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useConversationContext } from "@/contexts/ConversationContext";
-import { useAppContext } from "@/contexts/AppContext";
+import { useBasket } from "@/hooks/use-basket";
+import { useUIStore } from "@/stores/useUIStore";
 
 export default function BasketTabs() {
-	const { basket } = useAppContext();
+	const { basketConversations } = useBasket();
 
-	const { selectedConversationId } = useConversationContext();
+	const { selectedConversationId } = useUIStore();
 
 	// set the conversation id in the url params
 	const setConversationIdInParams = (conversationId: string) => {
@@ -20,7 +20,7 @@ export default function BasketTabs() {
 
 	return (
 		<div className="flex flex-row justify-between gap-0 w-full max-w-[90vw] items-center">
-			{basket.map((conversation) => (
+			{basketConversations.map((conversation) => (
 				<Button
 					key={conversation.id}
 					variant="outline"

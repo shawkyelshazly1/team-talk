@@ -395,6 +395,7 @@ export const loadConversationById = async (id: string) => {
                 status: true,
                 topic: true,
                 updatedAt: true,
+                ticketLink: true,
             },
         });
 

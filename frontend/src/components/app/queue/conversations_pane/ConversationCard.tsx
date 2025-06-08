@@ -5,7 +5,7 @@ import type { Conversation } from "@shared/types";
 import moment from "moment";
 import { useSession } from "@/lib/auh/auth-client";
 import { cn } from "@/lib/utils";
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUIStore } from "@/stores/useUIStore";
 export default function ConversationCard({
 	conversation,
 }: {
@@ -21,7 +21,7 @@ export default function ConversationCard({
 		window.history.pushState({}, "", newUrl);
 	};
 
-	const { selectedConversationId } = useConversationContext();
+	const { selectedConversationId } = useUIStore();
 
 	return (
 		<div className="flex flex-col gap-3">

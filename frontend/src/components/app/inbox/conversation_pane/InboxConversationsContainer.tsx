@@ -4,21 +4,20 @@ import InboxConversationCard from "./InboxConversationCard";
 import { useLoadInfiniteCsrConversations } from "@/services/queries/conversation";
 import { ClipLoader, SyncLoader } from "react-spinners";
 import type { Conversation } from "@shared/types";
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUIStore } from "@/stores/useUIStore";
 
 export default function InboxConversationsContainer({
 	status,
 }: {
 	status: Conversation["status"];
 }) {
-	const { selectedConversationId } = useConversationContext();
+	const { selectedConversationId } = useUIStore();
 
 	const {
 		data,
 		error,
 		fetchNextPage,
 		hasNextPage,
-
 		isFetchingNextPage,
 		status: infiniteStatus,
 	} = useLoadInfiniteCsrConversations(status, 10);

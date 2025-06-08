@@ -2,10 +2,10 @@
 
 import { cn } from "@/lib/utils";
 import { useSidebar } from "../ui/sidebar";
-import { useUserContext } from "@/contexts/UserContext";
+import { useUserStore } from "@/stores/useUserStore";
 
 export default function SidebarUserStatus() {
-	const { userStatus } = useUserContext();
+	const { userStatus } = useUserStore();
 	const { state } = useSidebar();
 
 	return (

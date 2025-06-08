@@ -6,7 +6,7 @@ import NewConversationModal from "./NewConversationModal";
 import InboxConversationsContainer from "./InboxConversationsContainer";
 import type { Conversation } from "@shared/types";
 import { Badge } from "@/components/ui/badge";
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUIStore } from "@/stores/useUIStore";
 
 export default function InboxConversationsArea() {
 	const statuses = [
@@ -16,14 +16,14 @@ export default function InboxConversationsArea() {
 		"closed",
 	] as Conversation["status"][];
 
-	const { setSelectedConversationId } = useConversationContext();
+	const { setSelectedConversationId } = useUIStore();
 
 	// clear state when navigating to a different route
 	useEffect(() => {
 		return () => {
 			setSelectedConversationId("");
 		};
-	}, []);
+	}, [setSelectedConversationId]);
 
 	return (
 		<div className="h-[100vh] flex-1 py-4 border-r border-border w-1/2 lg:w-1/3 px-1 justify-between flex flex-col gap-4">

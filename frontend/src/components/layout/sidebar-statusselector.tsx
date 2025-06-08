@@ -1,17 +1,20 @@
 "use client";
 import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useConversationContext } from "@/contexts/ConversationContext";
-import { useUserContext } from "@/contexts/UserContext";
-import { useAppContext } from "@/contexts/AppContext";
 import type { UserStatus } from "@shared/types";
 import { useSocket } from "@/hooks/use-socket";
 import toast from "react-hot-toast";
+import { useUserStore } from "@/stores/useUserStore";
+import { useUIStore } from "@/stores/useUIStore";
+import { useBasket } from "@/hooks/use-basket";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SidebarStatusSelector() {
-	const { clearBasket } = useAppContext();
-	const { userStatus } = useUserContext();
-	const { setSelectedConversationId } = useConversationContext();
+	const router = useRouter();
+	const { clearBasket } = useBasket();
+	const { userStatus } = useUserStore();
+	const { setSelectedConversationId } = useUIStore();
 	const { socket, isConnected } = useSocket();
 
 	const removeAllParamsFromUrl = () => {
@@ -26,6 +29,24 @@ export default function SidebarStatusSelector() {
 			toast.error("Failed to set status");
 		}
 	};
+	// handle when goes online and not on queue view for team leader event triggered from socketEvents
+	useEffect(() => {
+		const handleForceNavigate = (event: CustomEvent) => {
+			router.push(event.detail.path);
+		};
+
+		window.addEventListener(
+			"force-navigate",
+			handleForceNavigate as EventListener
+		);
+
+		return () => {
+			window.removeEventListener(
+				"force-navigate",
+				handleForceNavigate as EventListener
+			);
+		};
+	}, [router]);
 
 	return (
 		<>
@@ -48,11 +69,11 @@ export default function SidebarStatusSelector() {
 			<DropdownMenuItem
 				onClick={() => {
 					handleSetStatus("offline");
-					// TODO: unassign conversations on server side
-					// clearBasket();
-					// setSelectedConversationId("");
+					// FIXME: unassign conversations on server side
+					clearBasket();
+					setSelectedConversationId("");
 					// remove all params from the url
-					// removeAllParamsFromUrl();
+					removeAllParamsFromUrl();
 				}}
 				className={cn("cursor-pointer hover:bg-sidebar-accent p-0")}
 			>

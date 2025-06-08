@@ -1,7 +1,7 @@
-import { useAppContext } from "@/contexts/AppContext";
+import { useSocketStore } from "@/stores/useSocketStore";
 
 export const useSocket = () => {
-    const { socket, isConnected } = useAppContext();
+    const { socket, isConnected } = useSocketStore();
 
 
     return { socket, isConnected };

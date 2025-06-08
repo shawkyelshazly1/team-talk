@@ -22,7 +22,7 @@ export const registerUserListeners = (socket: ExtendedSocket) => {
             });
 
             // join user to room by userId
-            socket.join(user.id);
+            socket.join(`user_${user.id}`);
 
             // set user data
             socket.data.user = user;
@@ -61,7 +61,7 @@ export const registerUserListeners = (socket: ExtendedSocket) => {
 export const registerUserDisconnectionListeners = async (socket: ExtendedSocket) => {
     // exit user from room by userId
     if (socket.data.user) {
-        socket.leave(socket.data.user?.id);
+        socket.leave(`user_${socket.data.user?.id}`);
         // set user offline in redis
         switch (socket.data.user.role) {
             case "csr":

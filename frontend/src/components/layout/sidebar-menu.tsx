@@ -5,9 +5,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import { Inbox, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { useSession } from "@/lib/auh/auth-client";
-import { ClipLoader } from "react-spinners";
-import { useUserContext } from "@/contexts/UserContext";
+import { useUserStore } from "@/stores/useUserStore";
 
 // Team_lead Menu items.
 const team_lead_menu_items = [
@@ -32,7 +30,7 @@ const csr_menu_items = [
 	},
 ];
 export default function SidebarMenuLinks() {
-	const { user } = useUserContext();
+	const { user } = useUserStore();
 	const pathname = usePathname();
 
 	const menu_items =

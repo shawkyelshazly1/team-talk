@@ -16,13 +16,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { useUIStore } from "@/stores/useUIStore";
 
 export default function NewConversationModal() {
 	const [ticketLink, setTicketLink] = useState("");
 	const [message, setMessage] = useState("");
 	const [open, setOpen] = useState(false);
-	const { setSelectedConversationId } = useConversationContext();
+	const { setSelectedConversationId } = useUIStore();
 
 	const queryClient = useQueryClient();
 
