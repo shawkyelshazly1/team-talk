@@ -18,6 +18,7 @@ export interface ServerToClientEvents {
     assign_conversation: (data: { conversation: Conversation; }) => void;
     update_conversation: (data: { conversation: Omit<Conversation, "agent">; }) => void;
     remove_from_basket: (data: { conversation_id: string; }) => void;
+    current_status: (data: { status: UserStatus; }) => void;
 }
 
 
@@ -28,5 +29,5 @@ export interface ClientToServerEvents {
     join_conversation: (data: { conversation_id: string; }) => void;
     leave_conversation: (data: { conversation_id: string; }) => void;
     set_status: (data: { status: "online" | "offline"; }) => void;
-
+    get_current_status: () => void;
 }

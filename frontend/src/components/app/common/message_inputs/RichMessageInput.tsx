@@ -48,11 +48,8 @@ export default function RichMessageInput() {
 					<RichMessageInputToolbar />
 					<SendHorizonal
 						onClick={() => {
-							console.log(editorState);
 							let test = JSON.parse(editorState);
-							console.log(test);
 							const [editor] = useLexicalComposerContext();
-							console.log($generateHtmlFromNodes(editor, test));
 						}}
 						className=" mr-2 text-muted-foreground/80 hover:text-muted-foreground cursor-pointer"
 						size={30}

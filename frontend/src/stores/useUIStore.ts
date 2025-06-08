@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { devtools } from 'zustand/middleware';
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 interface UIStore {
     selectedConversationId: string;
@@ -13,29 +13,57 @@ interface UIStore {
     clearBasket: () => void;
     isInBasket: (conversationId: string) => boolean;
     // view mode
-    setViewMode: (mode: "csr-inbox" | "team-leader-multi" | "single-conversation") => void;
+    setViewMode: (
+        mode: "csr-inbox" | "team-leader-multi" | "single-conversation"
+    ) => void;
 }
 
+export const useUIStore = create<UIStore>()(
+    persist(
+        devtools((set, get) => ({
+            selectedConversationId: "",
+            basket: [],
+            viewMode: "single-conversation",
 
-export const useUIStore = create<UIStore>()(devtools((set, get) => ({
-    selectedConversationId: "",
-    basket: [],
-    viewMode: "single-conversation",
+            setSelectedConversationId: (selectedConversationId) =>
+                set({ selectedConversationId }),
 
-    setSelectedConversationId: (selectedConversationId) => set({ selectedConversationId }),
+            addToBasket: (conversationId) =>
+                set((state) => ({
+                    basket: state.basket.includes(conversationId)
+                        ? state.basket
+                        : [...state.basket, conversationId],
+                })),
 
-    addToBasket: (conversationId) => set((state) => ({
-        basket: state.basket.includes(conversationId) ? state.basket : [...state.basket, conversationId]
-    })),
+            removeFromBasket: (conversationId) =>
+                set((state) => ({
+                    basket: state.basket.filter((id) => id !== conversationId),
+                })),
 
-    removeFromBasket: (conversationId) => set((state) => ({
-        basket: state.basket.filter((id) => id !== conversationId)
-    })),
+            clearBasket: () => set({ basket: [] }),
 
-    clearBasket: () => set({ basket: [] }),
+            isInBasket: (conversationId) => get().basket.includes(conversationId),
 
-    isInBasket: (conversationId) => get().basket.includes(conversationId),
+            setViewMode: (viewMode) => set({ viewMode }),
+        })),
+        {
+            name: "team-talk-ui",
+            storage: createJSONStorage(() => localStorage),
 
+            // persist below
+            partialize: (state) => ({
+                basket: state.basket,
+                viewMode: state.viewMode,
+            }),
+            version: 1,
+        }
+    )
+);
 
-    setViewMode: (viewMode) => set({ viewMode }),
-})));
+if (typeof window !== "undefined") {
+    window.addEventListener("storage", (e) => {
+        if (e.key === "team-talk-ui") {
+            useUIStore.persist.rehydrate();
+        }
+    });
+}

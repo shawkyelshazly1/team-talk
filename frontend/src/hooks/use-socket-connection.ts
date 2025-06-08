@@ -1,6 +1,6 @@
 'use client';
 import { cleanupSocketEvents, setupSocketEvents } from "@/services/socketEventService";
-import { authenticateSocket, createSocketConnection, disconnectSocket, setUserStatus } from "@/services/socketService";
+import { authenticateSocket, createSocketConnection, disconnectSocket, requestCurrentUserStatus, setUserStatus } from "@/services/socketService";
 import { useSocketStore } from "@/stores/useSocketStore";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueryClient } from "@tanstack/react-query";
@@ -39,6 +39,7 @@ export const useSocketConnection = () => {
             newSocket.on("authenticated", () => {
                 setIsConnected(true);
                 toast.success("Connected", { id: toastId });
+                requestCurrentUserStatus(newSocket);
 
                 // set status online for CSRs
                 if (user.role === "csr") {

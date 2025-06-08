@@ -9,6 +9,7 @@ import { useUIStore } from "@/stores/useUIStore";
 import { useBasket } from "@/hooks/use-basket";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { setUserStatus } from "@/services/socketService";
 
 export default function SidebarStatusSelector() {
 	const router = useRouter();
@@ -24,7 +25,7 @@ export default function SidebarStatusSelector() {
 
 	const handleSetStatus = (status: UserStatus) => {
 		if (socket && isConnected) {
-			socket.emit("set_status", { status });
+			setUserStatus(socket, status);
 		} else {
 			toast.error("Failed to set status");
 		}

@@ -27,7 +27,6 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL("/", request.url));
         }
 
-        console.log(nextUrl.pathname);
 
 
         // check routes based on role

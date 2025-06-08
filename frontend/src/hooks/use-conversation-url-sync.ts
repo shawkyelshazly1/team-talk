@@ -15,11 +15,9 @@ export const useConversationUrlSync = () => {
     useEffect(() => {
         if (!user) return;
 
-        console.log('🔍 URL Sync Debug:', { pathname, userRole: user.role });
 
         // single conversation view: /app/conversations/[id]
         if (pathname.startsWith('/app/conversation/') && params.id) {
-            console.log('📱 Setting single-conversation mode');
 
             setSelectedConversationId(params.id as string);
             setViewMode('single-conversation');
@@ -28,14 +26,12 @@ export const useConversationUrlSync = () => {
 
         // multi conversation view: /app?conversation_id=xxx ( team lead only)
         else if (pathname === '/app' && user.role === 'team_lead') {
-            console.log('👥 Setting team-leader-multi mode');
 
             const conversationId = searchParams.get('conversation_id');
             setSelectedConversationId(conversationId || '');
             setViewMode('team-leader-multi');
             return;
         } else if (pathname === '/app/inbox') {
-            console.log('📮 Setting csr-inbox mode');
 
             const conversationId = searchParams.get('conversation_id');
             setSelectedConversationId(conversationId || '');
@@ -44,8 +40,6 @@ export const useConversationUrlSync = () => {
         }
 
         // Fallback: Handle unexpected combinations
-        console.log('⚠️ Unexpected path/role combination:', { pathname, role: user.role });
-
         // Redirect to appropriate page based on role
         if (user.role === 'team_lead' && pathname !== '/app') {
             window.location.href = '/app';

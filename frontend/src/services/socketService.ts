@@ -41,3 +41,7 @@ export const sendMessage = (socket: ExtendedSocket, message: string, conversatio
 export const disconnectSocket = (socket: ExtendedSocket) => {
     socket.disconnect();
 };
+
+export const requestCurrentUserStatus = (socket: ExtendedSocket) => {
+    socket.emit("get_current_status");
+};
