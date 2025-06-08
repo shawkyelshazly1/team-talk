@@ -58,6 +58,6 @@ export async function verifyConnections() {
 
 
     Object.entries(connections).forEach(([key, value]) => {
-        console.log(`${key}: ${value}`);
+        console.info(`${key}: ${value}`);
     });
 }   

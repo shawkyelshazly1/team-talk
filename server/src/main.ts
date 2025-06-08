@@ -49,5 +49,5 @@ initializeSocketIO(httpServer);
 
 httpServer.listen(PORT, () => {
     verifyConnections();
-    console.log(`Server is running on port ${PORT}`);
+    console.info(`Server is running on port ${PORT}`);
 });

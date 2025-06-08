@@ -22,7 +22,7 @@ export const initializeSocketIO = (httpServer: HttpServer) => {
         registerListeners(socket);
 
         socket.on("error", (error) => {
-            console.log("socket error: ", error);
+            console.error("socket error: ", error);
         });
 
         // regiser disconnecting event

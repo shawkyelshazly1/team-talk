@@ -88,11 +88,21 @@ const removeConversationFromBasket = async (conversationId: string, teamleaderId
     await redisClient.SREM(`tl:${teamleaderId}:basket`, conversationId);
 };
 
+const getAgentStatus = async (agentId: string): Promise<"online" | "offline"> => {
+    const isOnline = await redisClient.SISMEMBER("users:online_agents", agentId);
+    return isOnline ? "online" : "offline";
+};
+
+const getTeamleaderStatus = async (teamleaderId: string): Promise<"online" | "offline"> => {
+    const isOnline = await redisClient.HGET("users:online_teamleaders", teamleaderId);
+    return isOnline === "1" ? "online" : "offline";
+};
+
 
 export {
     setTeamleaderOnline,
     setTeamleaderOffline,
-    getConversationFromQueue, getOnlineTeamleaders, assignConversationToTeamleader, addConversationToQueue, setAgentOnline, setAgentOffline, getOnlineAgents, getTeamleaderBasket, clearTeamleaderBasket, removeConversationFromBasket
+    getConversationFromQueue, getOnlineTeamleaders, assignConversationToTeamleader, addConversationToQueue, setAgentOnline, setAgentOffline, getOnlineAgents, getTeamleaderBasket, clearTeamleaderBasket, removeConversationFromBasket, getAgentStatus, getTeamleaderStatus
 };
 
 

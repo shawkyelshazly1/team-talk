@@ -4,6 +4,8 @@ import { triggerQueueAssignment } from "../../services/queueAssignment";
 import { ExtendedSocket } from "../types";
 // register user listeners
 export const registerUserListeners = (socket: ExtendedSocket) => {
+
+   
     // authenticate user event listener
     socket.on("authenticate", async (data) => {
         const { user } = data;
@@ -54,6 +56,23 @@ export const registerUserListeners = (socket: ExtendedSocket) => {
             }
         }
 
+    });
+
+    // 🎯 Handle current status response
+    socket.on("get_current_status", async () => {
+        const user = socket.data.user;
+
+
+        if (!user) return;
+
+        if (user.role === "csr") {
+            const status = await redisUtils.getAgentStatus(user.id);
+            socket.emit("current_status", { status });
+        } else {
+            const status = await redisUtils.getTeamleaderStatus(user.id);
+
+            socket.emit("current_status", { status });
+        }
     });
 };
 

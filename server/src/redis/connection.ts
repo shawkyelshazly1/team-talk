@@ -22,6 +22,6 @@ export async function connectRedis() {
         await createKey("users:online_agents", "set");
         await createKey("conversations:queue", "list");
         // await createKey("conversations:messages", "json");
-        console.log("Redis connected");
+        console.info("Redis connected");
     });
 }
