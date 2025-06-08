@@ -164,6 +164,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺 Roadmap
 
-- [x] User status change
-- [ ] conversation assignment logic
-- [ ] realtime messaging
+- [x] User status monitoring and presence system
+- [ ] Smart conversation routing and assignment
+- [ ] Real-time messaging for team leads
+- [ ] Real-time messaging for customer service representatives
+- [ ] Automatic conversation reassignment for inactive chats
+- [ ] Comprehensive conversation history and analytics
+- [ ] Live performance metrics dashboard
+- [ ] Team lead intervention in unassigned conversations
+- [ ] Conversation priority queuing
+- [ ] SLA monitoring and alerts
