@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { connectRedis } from '../redis/connection';
 import { QueueWorker } from './queueWorker';
+import { redisCleanupService } from '../services/redisCleanupService';
 dotenv.config();
 
 async function startQueueWorker() {
@@ -11,21 +12,31 @@ async function startQueueWorker() {
         await connectRedis();
         console.info('✅ Redis connected');
 
+        // Pre-startup Cleanup
+        await redisCleanupService.cleanupStaleData();
+
         // create worker instance
         const worker = new QueueWorker();
 
-        // Graceful shutdown handling
-        process.on('SIGINT', () => {
-            console.log('\n Received SIGINT, shutting down gracefully...');
-            worker.stop();
-            process.exit(0);
-        });
+        //  graceful shutdown
+        const shutdown = async (signal: string) => {
+            console.log(`\n Received ${signal}, shutting down gracefully...`);
 
-        process.on('SIGTERM', () => {
-            console.log('\n Received SIGTERM, shutting down gracefully...');
+            // Stop worker first
             worker.stop();
+
+            // Give it time to finish current operations
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Final cleanup
+            await redisCleanupService.gracefulshutdown();
+
             process.exit(0);
-        });
+        };
+
+        // Graceful shutdown handling
+        process.on('SIGINT', () => shutdown('SIGINT'));
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
 
         // Start the worker
         await worker.start();

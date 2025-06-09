@@ -1,5 +1,6 @@
 import { assignConversationToTeamleader } from "../services/conversation";
 import { redisClient } from "../redis/connection";
+import { redisCleanupService } from "../services/redisCleanupService";
 
 interface WorkerStats {
     processed: number;
@@ -39,11 +40,15 @@ class QueueWorker {
             return;
         }
 
+        // cleanup stale data before starting
+        await redisCleanupService.cleanupStaleData();
+
         this.isRunning = true;
         console.info("Queue worker started");
 
         // start heartbeat interval
         this.startHeartbeat();
+        this.startPeriodicCleanup(); // Start periodic cleanup
 
         // main processing loop
         while (this.isRunning) {
@@ -64,6 +69,10 @@ class QueueWorker {
         console.info("Stopping queue worker");
         this.isRunning = false;
         this.stopHeartbeat();
+        this.stopPeriodicCleanup(); // Stop periodic cleanup
+
+        // 🧹 Graceful cleanup on shutdown
+        redisCleanupService.gracefulshutdown().catch(console.error);
     }
 
     private startHeartbeat(): void {
@@ -294,6 +303,26 @@ class QueueWorker {
             onlineTeamLeaders: teamLeaderIds.length,
             totalBasketItems,
         };
+    }
+
+    // Periodic cleanup every 5 minutes
+    private cleanupInterval: NodeJS.Timeout | null = null;
+
+    private startPeriodicCleanup(): void {
+        this.cleanupInterval = setInterval(async () => {
+            try {
+                await redisCleanupService.healthCheckCleanup();
+            } catch (error) {
+                console.error('Periodic cleanup error:', error);
+            }
+        }, 300000); // 5 minutes
+    }
+
+    private stopPeriodicCleanup(): void {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+            this.cleanupInterval = null;
+        }
     }
 }
 
