@@ -4,17 +4,17 @@ import { getWorkerStats } from "../utils/workerStats";
 const workerStatsRouter = Router();
 
 // JSON API endpoint
-workerStatsRouter.get('/api/worker/stats', async (req, res) => {
+workerStatsRouter.get("/api/worker/stats", async (req, res) => {
     try {
         const stats = await getWorkerStats();
         res.json(stats);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to get worker stats' });
+        res.status(500).json({ error: "Failed to get worker stats" });
     }
 });
 
 // HTML Dashboard
-workerStatsRouter.get('/worker/dashboard', async (req, res) => {
+workerStatsRouter.get("/worker/dashboard", async (req, res) => {
     try {
         const stats = await getWorkerStats();
 
@@ -67,14 +67,23 @@ workerStatsRouter.get('/worker/dashboard', async (req, res) => {
                             <span class="badge badge-${stats.status}">${stats.status}</span>
                         </div>
                         <div class="metric">
+                            <span>Worker Status:</span>
+                            <span class="badge badge-${stats.workerIsRunning ? "healthy" : "error"}">
+                                ${stats.workerIsRunning ? "Running" : "Stopped"}
+                            </span>
+                        </div>
+                        <div class="metric">
                             <span>Queue Length:</span>
-                            <span class="${stats.queueLength > 10 ? 'status-warning' : 'status-healthy'}">
+                            <span class="${stats.queueLength > 10 ? "status-warning" : "status-healthy"}">
                                 ${stats.queueLength} conversations
                             </span>
                         </div>
                         <div class="metric">
                             <span>Online Team Leaders:</span>
-                            <span class="${stats.onlineTeamLeaders === 0 ? 'status-error' : 'status-healthy'}">
+                            <span class="${stats.onlineTeamLeaders === 0
+                ? "status-error"
+                : "status-healthy"
+            }">
                                 ${stats.onlineTeamLeaders}
                             </span>
                         </div>
@@ -87,16 +96,25 @@ workerStatsRouter.get('/worker/dashboard', async (req, res) => {
                     <!-- Team Leaders Card -->
                     <div class="card">
                         <h2>👥 Team Leader Capacity</h2>
-                        ${Object.keys(stats.teamLeaderSlots).length === 0 ?
-                '<p style="color: #ef4444;">No team leaders online</p>' :
-                Object.entries(stats.teamLeaderSlots).map(([id, slots]) => `
+                        ${Object.keys(stats.teamLeaderSlots).length === 0
+                ? '<p style="color: #ef4444;">No team leaders online</p>'
+                : Object.entries(stats.teamLeaderSlots)
+                    .map(
+                        ([id, slots]) => `
                                 <div class="metric">
                                     <span>${id}</span>
-                                    <span class="${parseInt(slots) === 0 ? 'status-error' : parseInt(slots) <= 1 ? 'status-warning' : 'status-healthy'}">
+                                    <span class="${parseInt(slots) === 0
+                                ? "status-error"
+                                : parseInt(slots) <= 1
+                                    ? "status-warning"
+                                    : "status-healthy"
+                            }">
                                         ${slots} slots available
                                     </span>
                                 </div>
-                            `).join('')
+                            `
+                    )
+                    .join("")
             }
                     </div>
 
@@ -105,20 +123,43 @@ workerStatsRouter.get('/worker/dashboard', async (req, res) => {
                         <h2>🏥 Health Indicators</h2>
                         <div class="metric">
                             <span>Queue Status:</span>
-                            <span class="${stats.queueLength === 0 ? 'status-healthy' : stats.queueLength < 10 ? 'status-warning' : 'status-error'}">
-                                ${stats.queueLength === 0 ? 'Empty' : stats.queueLength < 10 ? 'Normal' : 'Busy'}
+                            <span class="${stats.queueLength === 0
+                ? "status-healthy"
+                : stats.queueLength < 10
+                    ? "status-warning"
+                    : "status-error"
+            }">
+                                ${stats.queueLength === 0
+                ? "Empty"
+                : stats.queueLength < 10
+                    ? "Normal"
+                    : "Busy"
+            }
                             </span>
                         </div>
                         <div class="metric">
                             <span>Team Leader Coverage:</span>
-                            <span class="${stats.onlineTeamLeaders === 0 ? 'status-error' : stats.onlineTeamLeaders < 2 ? 'status-warning' : 'status-healthy'}">
-                                ${stats.onlineTeamLeaders === 0 ? 'No Coverage' : stats.onlineTeamLeaders < 2 ? 'Limited' : 'Good'}
+                            <span class="${stats.onlineTeamLeaders === 0
+                ? "status-error"
+                : stats.onlineTeamLeaders < 2
+                    ? "status-warning"
+                    : "status-healthy"
+            }">
+                                ${stats.onlineTeamLeaders === 0
+                ? "No Coverage"
+                : stats.onlineTeamLeaders < 2
+                    ? "Limited"
+                    : "Good"
+            }
                             </span>
                         </div>
                         <div class="metric">
                             <span>Processing Capacity:</span>
                             <span class="status-healthy">
-                                ${Object.values(stats.teamLeaderSlots).reduce((sum, slots) => sum + parseInt(slots), 0)} total slots
+                                ${Object.values(stats.teamLeaderSlots).reduce(
+                (sum, slots) => sum + parseInt(slots),
+                0
+            )} total slots
                             </span>
                         </div>
                     </div>
@@ -136,7 +177,9 @@ workerStatsRouter.get('/worker/dashboard', async (req, res) => {
 
         res.send(html);
     } catch (error) {
-        res.status(500).send('<h1>Dashboard Error</h1><p>Failed to load worker stats</p>');
+        res
+            .status(500)
+            .send("<h1>Dashboard Error</h1><p>Failed to load worker stats</p>");
     }
 });
 

@@ -19,6 +19,7 @@ class QueueWorker {
     private pollInterval: number = 1000;
     private readonly maxInterval: number = 10000; // 30 seconds if idle
     private readonly minInterval: number = 100; // 100ms when busy
+    private heartbeatInterval: NodeJS.Timeout | null = null; // heartbeat interval
 
     private stats: WorkerStats = {
         processed: 0,
@@ -41,6 +42,9 @@ class QueueWorker {
         this.isRunning = true;
         console.info("Queue worker started");
 
+        // start heartbeat interval
+        this.startHeartbeat();
+
         // main processing loop
         while (this.isRunning) {
             try {
@@ -59,6 +63,36 @@ class QueueWorker {
     stop(): void {
         console.info("Stopping queue worker");
         this.isRunning = false;
+        this.stopHeartbeat();
+    }
+
+    private startHeartbeat(): void {
+        // set initial heartbeat
+        this.updateHeartbeat();
+
+        // update every 30 seconds
+        this.heartbeatInterval = setInterval(() => {
+            this.updateHeartbeat();
+        }, 5000);
+    }
+
+    private stopHeartbeat(): void {
+        if (this.heartbeatInterval) {
+            clearInterval(this.heartbeatInterval);
+            this.heartbeatInterval = null;
+        }
+
+        // Clear the heartbeat from Redis when stopping
+        redisClient.del('worker:heartbeat').catch(console.error);
+    }
+
+    private async updateHeartbeat(): Promise<void> {
+        try {
+            // set heartbeat in Redis
+            await redisClient.setEx('worker:heartbeat', 10, Date.now().toString());
+        } catch (error) {
+            console.error('Error updating heartbeat:', error);
+        }
     }
 
     private async processQueue(): Promise<number> {

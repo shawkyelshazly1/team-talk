@@ -8,6 +8,7 @@ export interface WorkerStats {
     teamLeaderSlots: Record<string, string>;
     timestamp: string;
     status: 'healthy' | 'warning' | 'error';
+    workerIsRunning: boolean;
 }
 
 export async function getWorkerStats(): Promise<WorkerStats> {
@@ -15,6 +16,10 @@ export async function getWorkerStats(): Promise<WorkerStats> {
         const queueLength = await redisClient.lLen('conversations:queue');
         const teamLeaderData = await redisClient.hGetAll('users:online_teamleaders');
         const onlineTeamLeaders = Object.keys(teamLeaderData).length;
+
+        // check worker heartbeat
+        const heartbeat = await redisClient.get('worker:heartbeat');
+        const workerIsRunning = heartbeat ? (Date.now() - parseInt(heartbeat)) < 10000 : false;
 
         let totalBasketItems = 0;
         for (const tlId of Object.keys(teamLeaderData)) {
@@ -24,6 +29,11 @@ export async function getWorkerStats(): Promise<WorkerStats> {
 
         // Determine status
         let status: 'healthy' | 'warning' | 'error' = 'healthy';
+
+        // Error conditions (system issues)
+        if (!workerIsRunning && queueLength > 0) {
+            status = 'error'; // Worker not running but has queued items
+        }
 
         // Warning conditions (operational issues, not errors)
         if (onlineTeamLeaders === 0 && queueLength > 0) {
@@ -45,7 +55,8 @@ export async function getWorkerStats(): Promise<WorkerStats> {
             totalBasketItems,
             teamLeaderSlots: teamLeaderData,
             timestamp: new Date().toISOString(),
-            status
+            status,
+            workerIsRunning
         };
     } catch (error) {
         console.error('Error getting worker stats:', error);
@@ -56,7 +67,8 @@ export async function getWorkerStats(): Promise<WorkerStats> {
             totalBasketItems: 0,
             teamLeaderSlots: {},
             timestamp: new Date().toISOString(),
-            status: 'error' // Real error - Redis down, connection failed, etc.
+            status: 'error', // Real error - Redis down, connection failed, etc.
+            workerIsRunning: false
         };
     }
 }

@@ -7,7 +7,9 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node dist/main.js",
 		"build": "tsc --build",
-		"start:dev": "nodemon ./src/main.ts"
+		"start:dev": "nodemon ./src/main.ts",
+		"start:worker": "tsx ./src/workers/index.ts",
+		"db:studio": "drizzle-kit studio"
 	},
 	"author": "shawkyelshazly",
 	"license": "MIT",
