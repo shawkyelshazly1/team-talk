@@ -165,7 +165,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🗺 Roadmap
 
 - [x] User status monitoring and presence system
-- [ ] Smart conversation routing and assignment
+- [x] Smart conversation routing and assignment
 - [ ] Real-time messaging for team leads
 - [ ] Real-time messaging for customer service representatives
 - [ ] Automatic conversation reassignment for inactive chats
@@ -174,3 +174,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Team lead intervention in unassigned conversations
 - [ ] Conversation priority queuing
 - [ ] SLA monitoring and alerts
+
+## 🐛 Issues
+
+- [ ] Refactor teamleader status management to remove unnecessary conversation_id parameter in online/offline state transitions
+- [ ] Fix removing assignee on conversation assignment, handle in better logic

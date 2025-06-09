@@ -1,11 +1,10 @@
 import { redisUtils } from "../../redis";
 import { conversationServices } from "../../services";
-import { triggerQueueAssignment } from "../../services/queueAssignment";
 import { ExtendedSocket } from "../types";
 // register user listeners
 export const registerUserListeners = (socket: ExtendedSocket) => {
 
-   
+
     // authenticate user event listener
     socket.on("authenticate", async (data) => {
         const { user } = data;
@@ -45,8 +44,6 @@ export const registerUserListeners = (socket: ExtendedSocket) => {
                 case "online":
                     await redisUtils.setTeamleaderOnline(socket.data.user.id);
                     socket.emit("ack_status", { success: true, status: "online" });
-                    // 🎯 EVENT-DRIVEN TRIGGER
-                    setImmediate(() => triggerQueueAssignment());
                     break;
                 case "offline":
                     await redisUtils.setTeamleaderOffline(socket.data.user.id);

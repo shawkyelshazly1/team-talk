@@ -8,6 +8,7 @@ import healthCheckRouter from "./utils/healthChecks";
 import { connectRedis } from "./redis/connection";
 import { initializeSocketIO } from "./socketio";
 import { createServer } from 'http';
+import { AssignmentEventHandler } from "./services/assignmentEventHandler";
 
 // initialize PORT
 const PORT = 5000;
@@ -45,7 +46,15 @@ connectRedis();
 // init socketIo connection
 initializeSocketIO(httpServer);
 
+// Initialize assignment event handler
+const assignmentEventHandler = new AssignmentEventHandler();
+assignmentEventHandler.start();
 
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+    await assignmentEventHandler.stop();
+    process.exit(0);
+});
 
 httpServer.listen(PORT, () => {
     verifyConnections();

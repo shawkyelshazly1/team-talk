@@ -98,11 +98,20 @@ const getTeamleaderStatus = async (teamleaderId: string): Promise<"online" | "of
     return isOnline === "1" ? "online" : "offline";
 };
 
+// When conversation is completed (increase available slots)
+const conversationCompleted = async (conversationId: string, teamLeaderId: string): Promise<void> => {
+    // Remove from basket
+    await redisClient.SREM(`tl:${teamLeaderId}:basket`, conversationId);
+
+    // Increase available slots by 1
+    await redisClient.HINCRBY('users:online_teamleaders', teamLeaderId, 1);
+};
+
 
 export {
     setTeamleaderOnline,
     setTeamleaderOffline,
-    getConversationFromQueue, getOnlineTeamleaders, assignConversationToTeamleader, addConversationToQueue, setAgentOnline, setAgentOffline, getOnlineAgents, getTeamleaderBasket, clearTeamleaderBasket, removeConversationFromBasket, getAgentStatus, getTeamleaderStatus
+    getConversationFromQueue, getOnlineTeamleaders, assignConversationToTeamleader, addConversationToQueue, setAgentOnline, setAgentOffline, getOnlineAgents, getTeamleaderBasket, clearTeamleaderBasket, removeConversationFromBasket, getAgentStatus, getTeamleaderStatus, conversationCompleted
 };
 
 

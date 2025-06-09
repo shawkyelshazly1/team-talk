@@ -18,9 +18,6 @@ import {
 } from "@shared/types";
 
 import { meilisearchQueries } from "../meilisearch";
-import { socketIOClient } from "../socketio";
-import { triggerQueueAssignment } from "../services/queueAssignment";
-import { redisUtils } from "../redis";
 
 // load csr conversations from DB by
 export const loadCsrConversations = async (

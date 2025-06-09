@@ -2,28 +2,34 @@ import type { Agent, Conversation } from "@shared/types";
 import { meilisearchMutations } from "../meilisearch";
 import { conversationRepo } from "../repos";
 import { redisUtils } from "../redis";
-import { triggerQueueAssignment } from "./queueAssignment";
 import { socketIOClient } from "../socketio";
+import { redisClient } from "../redis/connection";
 
 // create a new conversation service
-export const createNewConversation = async (user: Agent, ticketLink: string, message: string) => {
+export const createNewConversation = async (
+    user: Agent,
+    ticketLink: string,
+    message: string
+) => {
     try {
-
         // create conversation in DB
-        const conversation = await conversationRepo.createConversation(user as Agent, ticketLink, message);
+        const conversation = await conversationRepo.createConversation(
+            user as Agent,
+            ticketLink,
+            message
+        );
 
         // add message to meilisearch
         await meilisearchMutations.addMessageToMeilisearch({
-            ...conversation.lastMessage, sender: {
-                ...user, role: "csr"
+            ...conversation.lastMessage,
+            sender: {
+                ...user,
+                role: "csr",
             } satisfies Agent,
         });
 
         // add conversation to queue
         await redisUtils.addConversationToQueue(conversation.id);
-
-        // 🎯 EVENT-DRIVEN TRIGGER
-        setImmediate(() => triggerQueueAssignment());
 
         return conversation;
     } catch (error) {
@@ -32,10 +38,19 @@ export const createNewConversation = async (user: Agent, ticketLink: string, mes
 };
 
 // change conversation status service
-export const changeConversationStatus = async (conversationId: string, status: (Conversation["status"]), topic: string, user: Agent) => {
+export const changeConversationStatus = async (
+    conversationId: string,
+    status: Conversation["status"],
+    topic: string,
+    user: Agent
+) => {
     try {
-
-        const conversation = await conversationRepo.setConversationStatus(conversationId, status, topic, user);
+        const conversation = await conversationRepo.setConversationStatus(
+            conversationId,
+            status,
+            topic,
+            user
+        );
 
         // send update to all connected users in the conversation room
         socketIOClient.to(conversationId).emit("update_conversation", {
@@ -44,72 +59,66 @@ export const changeConversationStatus = async (conversationId: string, status: (
 
         // 🎯 EVENT-DRIVEN TRIGGER
         setTimeout(() => {
-            socketIOClient.emit("remove_from_basket", { conversation_id: conversationId });
+            socketIOClient.emit("remove_from_basket", {
+                conversation_id: conversationId,
+            });
             // remove conversation from basket
-            redisUtils.removeConversationFromBasket(conversationId, conversation?.assigneeId ?? "");
-            triggerQueueAssignment();
+            redisUtils.removeConversationFromBasket(
+                conversationId,
+                conversation?.assigneeId ?? ""
+            );
         }, 10000);
 
         return conversation;
-
     } catch (error) {
         throw error;
     }
 };
 
 // assign conversation to teamleader service
-export const assignConversationToTeamleader = async (): Promise<boolean> => {
+export const assignConversationToTeamleader = async (assignment: {
+    conversationId: string;
+    teamleaderId: string;
+}, isWorkerContext: boolean = false): Promise<boolean> => {
     try {
+        // Update database
+        const updatedConversation =
+            await conversationRepo.assignToTeamleader<Conversation>(
+                assignment.conversationId,
+                assignment.teamleaderId
+            );
 
-        // get conversation from queue based on FIFO
-        const conversationId = await redisUtils.getConversationFromQueue();
-        if (!conversationId) return false;
+        // Handle socket events differently in worker context
+        if (isWorkerContext) {
+            // Publish event to Redis for main server to handle
+            await redisClient.publish('assignment_events', JSON.stringify({
+                type: 'assign_conversation',
+                teamleaderId: assignment.teamleaderId,
+                conversation: updatedConversation
+            }));
 
-        // get online teamleaders
-        const onlineTls = await redisUtils.getOnlineTeamleaders();
-
-        // find best teamleader based on priority
-        let bestTl = null;
-        let mostAvailableSlots = 0;
-
-        for (const [tlId, availableSlots] of Object.entries(onlineTls)) {
-            const slots = parseInt(availableSlots);
-            if (slots > mostAvailableSlots) {
-                mostAvailableSlots = slots;
-                bestTl = tlId;
-            }
-        }
-
-        if (bestTl && mostAvailableSlots > 0) {
-
-            // Update database
-            const updatedConversation = await conversationRepo.assignToTeamleader<Conversation>(conversationId, bestTl);
-
-            // assign conversation to teamleader
-            await redisUtils.assignConversationToTeamleader(conversationId, bestTl);
-
-            // FIXME: send conversation to teamleader basket
-            socketIOClient.to(`user_${bestTl}`).emit("assign_conversation", {
-                conversation: updatedConversation,
-            });
-
-            return true;
         } else {
-            // add back to queue
-            await redisUtils.addConversationToQueue(conversationId);
-            return false;
+            // Direct socket emission (for main server context)
+            socketIOClient
+                .to(`user_${assignment.teamleaderId}`)
+                .emit("assign_conversation", {
+                    conversation: updatedConversation,
+                });
         }
 
-
+        return true;
     } catch (error) {
-        throw error;
+        console.error(
+            `Failed to assign conversation in DB ${assignment.conversationId} to teamleader ${assignment.teamleaderId}:`,
+            error
+        );
+        return false;
     }
 };
 
 // unassign conversation from teamleader service
 export const clearTeamleaderBasket = async (teamleaderId: string) => {
     try {
-
         // get conversations from teamleader basket
         const conversations = await redisUtils.getTeamleaderBasket(teamleaderId);
 
@@ -117,7 +126,8 @@ export const clearTeamleaderBasket = async (teamleaderId: string) => {
 
         // update conversations assignee to null  and return to queue
         for (const conversationId of conversations) {
-            const unassignedConversationId = await conversationRepo.unassignFromTeamleader(conversationId);
+            const unassignedConversationId =
+                await conversationRepo.unassignFromTeamleader(conversationId);
             unassignedConversations.push(unassignedConversationId);
         }
 
@@ -132,7 +142,6 @@ export const clearTeamleaderBasket = async (teamleaderId: string) => {
         }
 
         return true;
-
     } catch (error) {
         throw error;
     }
