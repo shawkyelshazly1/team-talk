@@ -312,6 +312,8 @@ class QueueWorker {
         this.cleanupInterval = setInterval(async () => {
             try {
                 await redisCleanupService.healthCheckCleanup();
+
+                console.info('Periodic cleanup completed');
             } catch (error) {
                 console.error('Periodic cleanup error:', error);
             }

@@ -5,6 +5,29 @@ import type { Conversation, Message } from "@shared/types";
 import type { QueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+// URL management helpers
+const updateUrlWithConversationId = (conversationId: string) => {
+	const searchParams = new URLSearchParams(window.location.search);
+	searchParams.set("conversation_id", conversationId);
+	const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+	window.history.replaceState({}, "", newUrl);
+};
+
+const clearConversationIdFromUrl = () => {
+	const searchParams = new URLSearchParams(window.location.search);
+	searchParams.delete("conversation_id");
+	const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+	window.history.replaceState({}, "", newUrl);
+};
+
+const syncUrlWithSelectedConversation = (conversationId: string | null) => {
+	if (conversationId) {
+		updateUrlWithConversationId(conversationId);
+	} else {
+		clearConversationIdFromUrl();
+	}
+};
+
 export const setupSocketEvents = (
 	socket: ExtendedSocket,
 	queryClient: QueryClient
@@ -22,11 +45,8 @@ export const setupSocketEvents = (
 			const user = useUserStore.getState().user;
 			if (data.status === "offline") {
 				useUIStore.getState().clearBasket();
-				// remove conversation id from url
-				const searchParams = new URLSearchParams(window.location.search);
-				searchParams.delete("conversation_id");
-				const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-				window.history.pushState({}, "", newUrl);
+				// Clear conversation ID from URL
+				clearConversationIdFromUrl();
 			} else if (data.status === "online" && user?.role === "team_lead") {
 				// 🎯 Trigger custom event instead of direct navigation
 				if (
@@ -47,6 +67,8 @@ export const setupSocketEvents = (
 
 	// conversation assignment events - store ID only, React Query has the data
 	socket.on("assign_conversation", (data) => {
+		const { selectedConversationId, setSelectedConversationId } = useUIStore.getState();
+
 		// add id to basket
 		useUIStore.getState().addToBasket(data.conversation.id);
 
@@ -55,6 +77,12 @@ export const setupSocketEvents = (
 			["conversation", data.conversation.id],
 			data.conversation
 		);
+
+		// If no conversation is currently selected, select this new one and update URL
+		if (!selectedConversationId) {
+			setSelectedConversationId(data.conversation.id);
+			syncUrlWithSelectedConversation(data.conversation.id);
+		}
 
 		// invalidate conversation list to show updates
 		invalidateAllCSRConversationTabs(queryClient);
@@ -74,23 +102,14 @@ export const setupSocketEvents = (
 			);
 
 			if (remainingBasket.length > 0) {
-				// Select first remaining conversation
+				// Select first remaining conversation and update URL
 				const newSelectedId = remainingBasket[0];
 				setSelectedConversationId(newSelectedId);
-
-				// Update URL
-				const searchParams = new URLSearchParams(window.location.search);
-				searchParams.set("conversation_id", newSelectedId);
-				const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-				window.history.replaceState({}, "", newUrl);
+				syncUrlWithSelectedConversation(newSelectedId);
 			} else {
 				// No conversations left, clear selection and URL
 				setSelectedConversationId("");
-
-				const searchParams = new URLSearchParams(window.location.search);
-				searchParams.delete("conversation_id");
-				const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-				window.history.replaceState({}, "", newUrl);
+				syncUrlWithSelectedConversation(null);
 			}
 		}
 	});
@@ -155,6 +174,35 @@ export const setupSocketEvents = (
 	socket.on("heartbeat_ack", (data) => {
 		if (!data.success) {
 			toast.error(data.message || "Failed to refresh TTL");
+		}
+	});
+
+	// sync basket events
+	socket.on("sync_basket", (data) => {
+		const { basket: serverBasket } = data;
+		const {
+			basket: localBasket,
+			clearBasket,
+			setSelectedConversationId,
+		} = useUIStore.getState();
+
+		if (JSON.stringify(serverBasket.sort()) !== JSON.stringify(localBasket.sort())) {
+
+			clearBasket();
+			serverBasket.forEach((id: string) => useUIStore.getState().addToBasket(id));
+
+			// update selected conversation
+			const currentSelected = useUIStore.getState().selectedConversationId;
+
+			if (currentSelected && !serverBasket.includes(currentSelected)) {
+				if (serverBasket.length > 0) {
+					setSelectedConversationId(serverBasket[0]);
+					syncUrlWithSelectedConversation(serverBasket[0]);
+				} else {
+					setSelectedConversationId("");
+					syncUrlWithSelectedConversation(null);
+				}
+			}
 		}
 	});
 };
@@ -235,11 +283,7 @@ const setInitialConversationWithDelay = () => {
 					const firstConversationId = basket[0];
 					useUIStore.getState().setSelectedConversationId(firstConversationId);
 
-					const searchParams = new URLSearchParams(window.location.search);
-					searchParams.set("conversation_id", firstConversationId);
-					const newUrl = `${window.location.pathname
-						}?${searchParams.toString()}`;
-					window.history.replaceState({}, "", newUrl);
+					syncUrlWithSelectedConversation(firstConversationId);
 				}
 			}
 		}

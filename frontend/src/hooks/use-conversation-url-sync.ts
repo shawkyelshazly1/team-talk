@@ -8,7 +8,7 @@ export const useConversationUrlSync = () => {
     const params = useParams();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    const { user } = useUserStore();
+    const { user, userStatus } = useUserStore();
     const { setSelectedConversationId, setViewMode } = useUIStore();
 
 
@@ -25,7 +25,7 @@ export const useConversationUrlSync = () => {
         }
 
         // multi conversation view: /app?conversation_id=xxx ( team lead only)
-        else if (pathname === '/app' && user.role === 'team_lead') {
+        else if (pathname === '/app' && user.role === 'team_lead' && userStatus === 'online') {
 
             const conversationId = searchParams.get('conversation_id');
             setSelectedConversationId(conversationId || '');
@@ -37,6 +37,12 @@ export const useConversationUrlSync = () => {
             setSelectedConversationId(conversationId || '');
             setViewMode('csr-inbox');
             return;
+        } else {
+            // remove conversation id from url
+            const searchParams = new URLSearchParams(window.location.search);
+            searchParams.delete("conversation_id");
+            const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
+            window.history.replaceState({}, "", newUrl);
         }
 
         // Fallback: Handle unexpected combinations

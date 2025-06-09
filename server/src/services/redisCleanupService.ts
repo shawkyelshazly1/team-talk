@@ -63,6 +63,8 @@ export class RedisCleanupService {
 
         // clean empty keys
         await this.cleanupEmptyKeys();
+
+        console.info("Stale data cleanup completed");
     }
 
     private async cleanupStaleHeartbeats(): Promise<void> {
@@ -127,6 +129,8 @@ export class RedisCleanupService {
 
         // Remove duplicate queue entries;
         await this.deduplicateQueue();
+
+
     }
 
     private async syncTeamLeaderSlots(): Promise<void> {

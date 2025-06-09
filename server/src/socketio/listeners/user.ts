@@ -27,6 +27,12 @@ export const registerUserListeners = (socket: ExtendedSocket) => {
 
             // set user data
             socket.data.user = user;
+
+            // sync basket which is usually if refresh on frontend or disconnect and reconnect
+            if (user.role === "team_lead") {
+                const currentBasket = await redisUtils.getTeamleaderBasket(user.id);
+                socket.emit("sync_basket", { basket: currentBasket });
+            }
         }
     });
 
