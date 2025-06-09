@@ -131,39 +131,55 @@ export const setupSocketEvents = (
 
 	// message events - always update cache, components decide what to show
 	socket.on("new_message", (data) => {
-		queryClient.setQueryData(
-			["conversation_messages", data.conversation_id],
-			(oldData: any) => {
-				if (!oldData)
-					return { pages: [{ messages: [data.message], total: 1 }] };
+		console.log("new_message", data);
+		// Get all query cache entries that match the conversation messages pattern
+		const queryCache = queryClient.getQueryCache();
+		const messageCacheEntries = queryCache.findAll({
+			predicate: (query) => {
+				const [type, conversationId] = query.queryKey;
+				return type === "conversation_messages" && conversationId === data.conversationId;
+			},
+			type: "active"
+		});
 
-				const newPages = [...oldData.pages];
-				if (newPages[0]) {
-					const messageExists = newPages[0].messages.some(
-						(m: Message) => m.id === data.message.id
+		// Update each matching cache entry
+		messageCacheEntries.forEach((cacheEntry) => {
+			queryClient.setQueryData(
+				cacheEntry.queryKey,
+				(oldData: any) => {
+					if (!oldData)
+						return { pages: [{ messages: [data.message], total: 1 }] };
+
+					const newPages = [...oldData.pages];
+
+					// Check if message already exists to prevent duplicates
+					const messageExists = newPages.some(page =>
+						page.messages.some((m: Message) => m.id === data.message.id)
 					);
-					if (!messageExists) {
+
+					if (!messageExists && newPages[0]) {
+						// 🎯 FIX: DON'T increment total - server count already includes this message
 						newPages[0] = {
 							...newPages[0],
-							messages: [...newPages[0].messages, data.message],
-							total: newPages[0].total + 1,
+							messages: [data.message, ...newPages[0].messages],
+							// total stays the same - server already counted this message
 						};
 					}
-				}
 
-				return { ...oldData, pages: newPages };
-			}
-		);
+					return { ...oldData, pages: newPages };
+				}
+			);
+		});
 
 		const user = useUserStore.getState().user;
 		if (user?.role === "csr") {
 			const conversationExists = queryClient.getQueryData([
 				"conversation",
-				data.conversation_id,
+				data.conversationId,
 			]);
 
 			if (!conversationExists) {
-				fetchAndAddConversationToCSRLists(queryClient, data.conversation_id);
+				fetchAndAddConversationToCSRLists(queryClient, data.conversationId);
 			} else {
 				invalidateAllCSRConversationTabs(queryClient);
 			}
@@ -253,6 +269,7 @@ const fetchAndAddConversationToCSRLists = async (
 };
 
 const invalidateAllCSRConversationTabs = (queryClient: QueryClient) => {
+	//FIXME: this is a hack to invalidate the conversation tabs, we should use the query function instead and trigger what tab user is in & as well as moving conversation to the correct tab
 	queryClient.invalidateQueries({ queryKey: ["csr_conversations", "active"] });
 	queryClient.invalidateQueries({ queryKey: ["csr_conversations", "pending"] });
 	queryClient.invalidateQueries({ queryKey: ["csr_conversations", "solved"] });

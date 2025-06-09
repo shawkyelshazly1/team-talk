@@ -1,3 +1,4 @@
+import { conversationServices } from "../../services";
 import { ExtendedSocket } from "../types";
 
 
@@ -12,10 +13,32 @@ export const registerConversationListeners = (socket: ExtendedSocket) => {
         socket.leave(data.conversation_id);
     });
 
-    socket.on("new_message", (data) => {
-        console.log("new_message", data);
+    socket.on("new_message", async (data) => {
 
-        // TODO:handle creating new message
+        // create new message
+        const newMessage = await conversationServices.createNewMessage(data.content, data.sender_id, data.conversation_id);
+
+        const { socketIOClient } = await import("../index");
+
+        socketIOClient.to(data.conversation_id).emit("new_message", {
+            message: newMessage,
+            conversationId: data.conversation_id,
+        });
+
+        if (socket.data.user?.role === "csr") {
+            socketIOClient.to(`user_${data.agent_id}`).emit("new_message", {
+                message: newMessage,
+                conversationId: data.conversation_id,
+            });
+        }
+
+        if (data.sender_id !== data.agent_id) {
+            // send message to agent room
+            socket.to(`user_${data.agent_id}`).emit("new_message", {
+                message: newMessage,
+                conversationId: data.conversation_id,
+            });
+        }
         return;
     });
 };

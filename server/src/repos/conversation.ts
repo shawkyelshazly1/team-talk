@@ -587,6 +587,32 @@ export const loadHistoricalConversations = async (
 };
 
 
+// create new message
+export const createNewMessage = async (content: string, senderId: string, conversationId: string) => {
+    try {
+
+        const newMessage = await db.insert(message).values({
+            id: uuidv4(),
+            conversationId,
+            content,
+            senderId: senderId
+        }).returning();
+
+        const messageWithSender = await db.select({
+            message: message,
+            sender: user
+        })
+            .from(message)
+            .where(eq(message.id, newMessage[0].id))
+            .leftJoin(user, eq(message.senderId, user.id));
+
+        return { ...messageWithSender[0].message, sender: messageWithSender[0].sender as User } satisfies Message;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 // create conversation by csr
 export const createConversation = async (user: Agent, ticketLink: string, messageContent: string) => {
     try {
@@ -598,12 +624,7 @@ export const createConversation = async (user: Agent, ticketLink: string, messag
         }).returning();
 
         //create new message
-        const newMessage = await db.insert(message).values({
-            id: uuidv4(),
-            conversationId: newConversation[0].id,
-            content: messageContent,
-            senderId: user.id,
-        }).returning();
+        const newMessage = await createNewMessage(messageContent, user.id, newConversation[0].id);
 
         return {
             ...newConversation[0],
@@ -611,14 +632,7 @@ export const createConversation = async (user: Agent, ticketLink: string, messag
                 ...user,
                 role: "csr",
             },
-            lastMessage: {
-                ...newMessage[0],
-                conversationId: newConversation[0].id,
-                sender: {
-                    ...user,
-                    role: "csr",
-                } satisfies Agent,
-            },
+            lastMessage: newMessage,
 
         } satisfies Conversation;
 

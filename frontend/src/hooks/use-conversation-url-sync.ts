@@ -31,18 +31,24 @@ export const useConversationUrlSync = () => {
             setSelectedConversationId(conversationId || '');
             setViewMode('team-leader-multi');
             return;
+
+            // csr inbox view: /app/inbox?conversation_id=xxx
         } else if (pathname === '/app/inbox') {
 
             const conversationId = searchParams.get('conversation_id');
             setSelectedConversationId(conversationId || '');
             setViewMode('csr-inbox');
             return;
+
         } else {
-            // remove conversation id from url
-            const searchParams = new URLSearchParams(window.location.search);
-            searchParams.delete("conversation_id");
-            const newUrl = `${window.location.pathname}?${searchParams.toString()}`;
-            window.history.replaceState({}, "", newUrl);
+            setSelectedConversationId('');
+            // Clear conversation_id from URL if it exists
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('conversation_id')) {
+                urlParams.delete("conversation_id");
+                const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+                window.history.replaceState({}, "", newUrl);
+            }
         }
 
         // Fallback: Handle unexpected combinations
