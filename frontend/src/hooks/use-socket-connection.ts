@@ -1,6 +1,6 @@
 'use client';
 import { cleanupSocketEvents, setupSocketEvents } from "@/services/socketEventService";
-import { authenticateSocket, createSocketConnection, disconnectSocket, requestCurrentUserStatus, setUserStatus } from "@/services/socketService";
+import { authenticateSocket, createSocketConnection, disconnectSocket, requestCurrentUserStatus, setUserStatus, startHeartbeat } from "@/services/socketService";
 import { useSocketStore } from "@/stores/useSocketStore";
 import { useUserStore } from "@/stores/useUserStore";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,6 +14,8 @@ export const useSocketConnection = () => {
     const queryClient = useQueryClient();
     const { user } = useUserStore();
     const { socket, isConnected, setSocket, setIsConnected } = useSocketStore();
+    const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
+
 
     // use ref to track user for cleanup
     const prevUserRef = useRef<typeof user>(null);
@@ -40,6 +42,11 @@ export const useSocketConnection = () => {
                 setIsConnected(true);
                 toast.success("Connected", { id: toastId });
                 requestCurrentUserStatus(newSocket);
+
+                // Start heatbeat for TTL refresh
+                if (user.role === "team_lead") {
+                    heartbeatRef.current = startHeartbeat(newSocket);
+                }
 
                 // set status online for CSRs
                 if (user.role === "csr") {
@@ -91,6 +98,12 @@ export const useSocketConnection = () => {
             if (socket) {
                 cleanupSocketEvents(socket);
             }
+
+            if (heartbeatRef.current) {
+                clearInterval(heartbeatRef.current);
+            }
+
+
 
         };
     }, [user, socket, queryClient, setSocket, setIsConnected]);

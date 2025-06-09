@@ -45,3 +45,15 @@ export const disconnectSocket = (socket: ExtendedSocket) => {
 export const requestCurrentUserStatus = (socket: ExtendedSocket) => {
     socket.emit("get_current_status");
 };
+
+export const sendHeartbeat = (socket: ExtendedSocket) => {
+    socket.emit("heartbeat");
+};
+
+export const startHeartbeat = (socket: ExtendedSocket) => {
+    return setInterval(() => {
+        if (socket.connected) {
+            sendHeartbeat(socket);
+        }
+    }, 5000); // 5 seconds
+};

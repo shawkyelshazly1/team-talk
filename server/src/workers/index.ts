@@ -29,7 +29,7 @@ async function startQueueWorker() {
             await new Promise(resolve => setTimeout(resolve, 2000));
 
             // Final cleanup
-            await redisCleanupService.gracefulshutdown();
+            await redisCleanupService.gracefulShutdown();
 
             process.exit(0);
         };
