@@ -11,6 +11,7 @@ import { createServer } from 'http';
 import { AssignmentEventHandler } from "./services/assignmentEventHandler";
 import workerStatsRouter from "./routers/monitoring";
 import { GracefulShutdownService } from "./services/gracefulShutdown";
+import adminRouter from "./routers/admin";
 
 // initialize PORT
 const PORT = 5000;
@@ -38,6 +39,7 @@ app.use(express.json());
 app.use("/api/conversations", conversationRouter);
 app.use("/api/filters", filtersRouter);
 app.use("/", workerStatsRouter);
+app.use("/api/admin", adminRouter);
 
 // register health check router
 app.use(healthCheckRouter);
