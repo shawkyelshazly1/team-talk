@@ -80,13 +80,11 @@ sudo systemctl start redis-server
 cd server
 npm run dev
 
-# Terminal 2: Start queue worker
-cd server
-npx ts-node src/workers/index.ts
+# Terminal 2: Queue worker
+cd server && npm run start:worker
 
-# Terminal 3: Start frontend
-cd frontend
-npm run dev
+# Terminal 3: Frontend
+cd frontend && npm run dev
 ```
 
 ### 🔍 Development Tools
@@ -234,7 +232,7 @@ socket.on("assign_conversation", (data) => {
 });
 ```
 
-## 🧪 Testing Strategy
+## �� Testing Strategy
 
 ### Unit Tests
 

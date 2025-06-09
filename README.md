@@ -43,6 +43,7 @@ Team Talk is an **internal customer service support platform** that enables CSR 
 - 🟢 **Live user status** monitoring with cross-tab synchronization
 - 🔗 **URL-based routing** for conversation navigation
 - 📱 **Responsive design** optimized for remote work environments
+- 🛡️ **Auto-cleanup system** with TTL expiration and graceful shutdown handling
 
 ## 🚀 Quick Start
 
