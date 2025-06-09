@@ -3,6 +3,7 @@ import { useUIStore } from "@/stores/useUIStore";
 import { useUserStore } from "@/stores/useUserStore";
 import type { Conversation, Message } from "@shared/types";
 import type { QueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export const setupSocketEvents = (
 	socket: ExtendedSocket,
@@ -149,6 +150,13 @@ export const setupSocketEvents = (
 			}
 		}
 	});
+
+	// heartbeat events
+	socket.on("heartbeat_ack", (data) => {
+		if (!data.success) {
+			toast.error(data.message || "Failed to refresh TTL");
+		}
+	});
 };
 
 const fetchAndAddConversationToCSRLists = async (
@@ -229,9 +237,8 @@ const setInitialConversationWithDelay = () => {
 
 					const searchParams = new URLSearchParams(window.location.search);
 					searchParams.set("conversation_id", firstConversationId);
-					const newUrl = `${
-						window.location.pathname
-					}?${searchParams.toString()}`;
+					const newUrl = `${window.location.pathname
+						}?${searchParams.toString()}`;
 					window.history.replaceState({}, "", newUrl);
 				}
 			}

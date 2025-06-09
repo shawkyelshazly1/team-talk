@@ -19,6 +19,7 @@ export interface ServerToClientEvents {
     update_conversation: (data: { conversation: Omit<Conversation, "agent">; }) => void;
     remove_from_basket: (data: { conversation_id: string; }) => void;
     current_status: (data: { status: UserStatus; }) => void;
+    heartbeat_ack: (data: { timestamp: number; success: boolean; message?: string; }) => void;
 }
 
 
@@ -30,4 +31,6 @@ export interface ClientToServerEvents {
     leave_conversation: (data: { conversation_id: string; }) => void;
     set_status: (data: { status: "online" | "offline"; }) => void;
     get_current_status: () => void;
+    heartbeat: () => void;
+
 }

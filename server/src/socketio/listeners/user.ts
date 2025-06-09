@@ -71,6 +71,22 @@ export const registerUserListeners = (socket: ExtendedSocket) => {
             socket.emit("current_status", { status });
         }
     });
+
+    // heartbeat listener
+    socket.on("heartbeat", async () => {
+        if (!socket.data.user) return;
+
+        if (socket.data.user.role === "team_lead") {
+            try {
+                // refresh ttl for team leader
+                await redisUtils.refreshTeamleaderTTL(socket.data.user.id);
+                socket.emit("heartbeat_ack", { timestamp: Date.now(), success: true });
+            } catch (error) {
+                console.error('Heartbeat refresh failed:', error);
+                socket.emit("heartbeat_ack", { timestamp: Date.now(), success: false, message: "Failed to refresh TTL" });
+            }
+        }
+    });
 };
 
 // register user disconnection listeners

@@ -35,6 +35,8 @@ const setTeamleaderOnline = async (teamleaderId: string): Promise<void> => {
     const availableSlots = MAX_BASKET_SIZE - currentBasket.length;
 
     await redisClient.HSET("users:online_teamleaders", teamleaderId, availableSlots);
+    // add 10-minute TTL for auto-cleanup
+    await redisClient.EXPIRE(`users:online_teamleaders`, 600);
 };
 
 const setTeamleaderOffline = async (teamleaderId: string): Promise<void> => {
@@ -56,6 +58,22 @@ const getOnlineTeamleaders = async (): Promise<Record<string, string>> => {
 const assignConversationToTeamleader = async (conversationId: string, teamleaderId: string): Promise<void> => {
     await redisClient.SADD(`tl:${teamleaderId}:basket`, conversationId);
     await redisClient.HINCRBY("users:online_teamleaders", teamleaderId, -1);
+
+    // set basket TTL ( 2 HOURS )
+    await redisClient.EXPIRE(`tl:${teamleaderId}:basket`, 7200);
+};
+
+const refreshTeamleaderTTL = async (teamleaderId: string): Promise<void> => {
+    // refresh if team leadedr is online and active
+    const exists = await redisClient.HEXISTS("users:online_teamleaders", teamleaderId);
+    if (exists) {
+        await redisClient.EXPIRE(`users:online_teamleaders`, 600);
+
+        const basketExists = await redisClient.EXISTS(`tl:${teamleaderId}:basket`);
+        if (basketExists) {
+            await redisClient.EXPIRE(`tl:${teamleaderId}:basket`, 7200);
+        }
+    }
 };
 
 const addConversationToQueue = async (conversationId: string): Promise<void> => {
@@ -111,7 +129,7 @@ const conversationCompleted = async (conversationId: string, teamLeaderId: strin
 export {
     setTeamleaderOnline,
     setTeamleaderOffline,
-    getConversationFromQueue, getOnlineTeamleaders, assignConversationToTeamleader, addConversationToQueue, setAgentOnline, setAgentOffline, getOnlineAgents, getTeamleaderBasket, clearTeamleaderBasket, removeConversationFromBasket, getAgentStatus, getTeamleaderStatus, conversationCompleted
+    getConversationFromQueue, getOnlineTeamleaders, assignConversationToTeamleader, addConversationToQueue, setAgentOnline, setAgentOffline, getOnlineAgents, getTeamleaderBasket, clearTeamleaderBasket, removeConversationFromBasket, getAgentStatus, getTeamleaderStatus, conversationCompleted, refreshTeamleaderTTL
 };
 
 

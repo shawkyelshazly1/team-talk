@@ -72,7 +72,7 @@ class QueueWorker {
         this.stopPeriodicCleanup(); // Stop periodic cleanup
 
         // 🧹 Graceful cleanup on shutdown
-        redisCleanupService.gracefulshutdown().catch(console.error);
+        redisCleanupService.gracefulShutdown().catch(console.error);
     }
 
     private startHeartbeat(): void {

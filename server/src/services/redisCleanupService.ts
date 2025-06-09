@@ -5,7 +5,7 @@ export class RedisCleanupService {
      * Graceful shutdown cleanup - called when worker/server stops
      */
 
-    async gracefulshutdown(): Promise<void> {
+    async gracefulShutdown(): Promise<void> {
         console.info("Starting graceful shutdown Rediscleanup...");
 
         try {

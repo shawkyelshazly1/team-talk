@@ -10,6 +10,7 @@ import { initializeSocketIO } from "./socketio";
 import { createServer } from 'http';
 import { AssignmentEventHandler } from "./services/assignmentEventHandler";
 import workerStatsRouter from "./routers/monitoring";
+import { GracefulShutdownService } from "./services/gracefulShutdown";
 
 // initialize PORT
 const PORT = 5000;
@@ -52,11 +53,9 @@ initializeSocketIO(httpServer);
 const assignmentEventHandler = new AssignmentEventHandler();
 assignmentEventHandler.start();
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-    await assignmentEventHandler.stop();
-    process.exit(0);
-});
+// Initialize graceful shutdown service
+const shutdownService = new GracefulShutdownService(httpServer, assignmentEventHandler);
+shutdownService.setupShutdownHandlers();
 
 httpServer.listen(PORT, () => {
     verifyConnections();
