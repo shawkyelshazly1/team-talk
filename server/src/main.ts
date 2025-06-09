@@ -9,6 +9,7 @@ import { connectRedis } from "./redis/connection";
 import { initializeSocketIO } from "./socketio";
 import { createServer } from 'http';
 import { AssignmentEventHandler } from "./services/assignmentEventHandler";
+import workerStatsRouter from "./routers/monitoring";
 
 // initialize PORT
 const PORT = 5000;
@@ -35,6 +36,7 @@ app.use(express.json());
 // register routers
 app.use("/api/conversations", conversationRouter);
 app.use("/api/filters", filtersRouter);
+app.use("/", workerStatsRouter);
 
 // register health check router
 app.use(healthCheckRouter);

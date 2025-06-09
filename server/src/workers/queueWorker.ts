@@ -17,7 +17,7 @@ interface Assignment {
 class QueueWorker {
     private isRunning: boolean = false;
     private pollInterval: number = 1000;
-    private readonly maxInterval: number = 30000; // 30 seconds if idle
+    private readonly maxInterval: number = 10000; // 30 seconds if idle
     private readonly minInterval: number = 100; // 100ms when busy
 
     private stats: WorkerStats = {
@@ -106,6 +106,7 @@ class QueueWorker {
         if (processedCount > 0) {
             console.info(`Processed ${processedCount} assignments this cycle`);
         }
+
         return processedCount;
     }
 

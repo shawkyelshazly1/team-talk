@@ -166,6 +166,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [x] User status monitoring and presence system
 - [x] Smart conversation routing and assignment
+- [ ] Build worker dashboard for monitoring queue assignment
 - [ ] Real-time messaging for team leads
 - [ ] Real-time messaging for customer service representatives
 - [ ] Automatic conversation reassignment for inactive chats
@@ -174,6 +175,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Team lead intervention in unassigned conversations
 - [ ] Conversation priority queuing
 - [ ] SLA monitoring and alerts
+- [ ] Improve UI responsiveness
 
 ## 🐛 Issues
 

@@ -18,9 +18,9 @@ export async function connectRedis() {
 
     redisClient.on("connect", async () => {
         // stablish keys
-        await createKey("users:online_teamleaders", "hash");
-        await createKey("users:online_agents", "set");
-        await createKey("conversations:queue", "list");
+        // await createKey("users:online_teamleaders", "hash");
+        // await createKey("users:online_agents", "set");
+        // await createKey("conversations:queue", "list");
         // await createKey("conversations:messages", "json");
         console.info("Redis connected");
     });
