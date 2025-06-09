@@ -57,19 +57,24 @@ channel.publish("conversation:assigned", { conversationId, teamleaderId });
 ```
 frontend/src/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── app/               # Team leader multi-conversation view
-│   ├── inbox/             # CSR agent inbox view
-│   ├── conversation/[id]  # Single conversation view
-│   └── layout.tsx         # Root layout
+│   ├── app/               # Team leader routes
+│   │   ├── conversation/[id]  # Single conversation view
+│   │   ├── inbox/         # CSR agent inbox view
+│   │   ├── search/        # Search functionality
+│   │   ├── page.tsx       # Team leader multi-conversation view
+│   │   └── layout.tsx     # App layout with sidebar
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Landing page
+│   └── globals.css        # Global styles
 │
 ├── components/            # UI Components
 │   ├── app/               # Application-specific components
 │   │   ├── common/        # Shared components (messages, cards)
 │   │   ├── queue/         # Queue management components
-│   │   └── conversation/  # Conversation components
-│   ├── layout/            # Layout components (status selector)
-│   └── ui/                # Base UI components
+│   │   ├── inbox/         # CSR inbox components
+│   │   └── conversations/ # Conversation components
+│   ├── layout/            # Layout components (sidebar, status selector)
+│   └── ui/                # Base UI components (shadcn/ui)
 │
 ├── stores/                # Zustand State Management
 │   ├── useUserStore.ts    # User state, authentication, status
@@ -77,14 +82,23 @@ frontend/src/
 │   └── useSocketStore.ts  # Socket connection state
 │
 ├── hooks/                 # Custom React Hooks
-│   ├── use-socket-connection.ts  # Socket connection management
-│   ├── use-conversation-rooms.ts # Room join/leave logic
-│   └── use-basket.ts            # Basket operations for team leaders
+│   ├── use-socket-connection.ts     # Socket connection management
+│   ├── use-conversation-rooms.ts    # Room join/leave logic
+│   ├── use-conversation-url-sync.ts # URL state synchronization
+│   ├── use-app-socket.ts           # Combined socket hooks
+│   ├── use-basket.ts               # Basket operations for team leaders
+│   ├── use-conversation-socket.ts   # Conversation-specific socket events
+│   ├── use-socket.ts               # Base socket hook
+│   └── use-mobile.ts               # Mobile responsive utilities
 │
 ├── services/              # External Services
 │   ├── socketService.ts   # Socket emission functions
 │   ├── socketEventService.ts # Socket event handlers
-│   └── api.ts             # REST API client
+│   └── queries/           # React Query API services
+│
+├── lib/                   # Utilities and configurations
+│   ├── socketio/          # Socket.IO client setup
+│   └── utils.ts           # Utility functions
 │
 └── providers/             # Context Providers
     └── UserStoreInitializer.tsx  # Store initialization
@@ -96,13 +110,15 @@ frontend/src/
 server/src/
 ├── db/                    # Database Layer
 │   ├── schema/            # Drizzle schema definitions
+│   │   ├── auth/          # Authentication tables (user, session, account)
+│   │   └── app/           # Application tables (conversation, message)
 │   └── connection.ts      # Database connection
 │
 ├── routers/               # API Routes
 │   ├── auth.ts            # Authentication endpoints
 │   ├── conversation.ts    # Conversation CRUD
 │   ├── user.ts            # User management
-│   └── monitoring.ts      # Worker monitoring endpoints
+│   └── worker.ts          # Worker monitoring endpoints
 │
 ├── services/              # Business Logic
 │   ├── conversation.ts    # Conversation operations & assignment
@@ -111,7 +127,9 @@ server/src/
 │
 ├── workers/               # Queue Processing
 │   ├── queueWorker.ts     # Main worker class with adaptive polling
-│   └── index.ts           # Production entry point
+│   ├── index.ts           # Production entry point
+│   ├── test-worker.ts     # Simple test worker
+│   └── test-worker-with-data.ts # Worker testing with sample data
 │
 ├── socketio/              # Real-time Layer
 │   ├── listeners/         # Socket event listeners
@@ -121,16 +139,18 @@ server/src/
 │
 ├── redis/                 # Redis Layer
 │   ├── connection.ts      # Redis client
-│   ├── utils.ts           # Redis operations (baskets, queues)
-│   └── pubsub.ts          # Pub/sub handling
+│   └── utils.ts           # Redis operations (baskets, queues)
 │
 ├── repos/                 # Data Access Layer
 │   ├── conversation.ts    # Conversation database operations
 │   └── user.ts            # User database operations
 │
-└── utils/                 # Utilities
-    ├── workerStats.ts     # Worker monitoring statistics
-    └── verifyConnections.ts # Health checks
+├── handlers/              # Event handlers
+├── lib/                   # Shared utilities
+├── middlewares/           # Express middlewares
+├── meilisearch/           # Search integration
+├── utils/                 # Utility functions
+└── main.ts                # Application entry point
 ```
 
 ## 🔄 Data Flow
@@ -188,7 +208,18 @@ Team leader goes offline → Clear basket → Return conversations to queue
 - **Room-based messaging** for targeted updates
 - **Event consolidation** to minimize network traffic
 - **Connection pooling** for high concurrency
-- **Cross-tab coordination** to prevent duplicate connections
+- **Cross-tab coordination** via Zustand localStorage persistence with `storage` event listeners
+
+```typescript
+// Cross-tab sync implementation in stores
+if (typeof window !== "undefined") {
+	window.addEventListener("storage", (e) => {
+		if (e.key === "team-talk-user") {
+			useUserStore.persist.rehydrate();
+		}
+	});
+}
+```
 
 ## 🔒 Security Considerations
 

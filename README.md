@@ -93,27 +93,33 @@ cd frontend && npm run dev
 
 ```
 team-talk/
-├── frontend/               # Next.js frontend application
+├── frontend/                    # Next.js frontend application
 │   ├── src/
-│   │   ├── app/           # Next.js app router pages
-│   │   │   ├── app/       # Team leader multi-conversation view
-│   │   │   ├── inbox/     # CSR agent inbox view
-│   │   │   └── conversation/[id]  # Single conversation view
-│   │   ├── components/    # Reusable UI components
-│   │   ├── stores/        # Zustand state management
-│   │   ├── hooks/         # Custom React hooks
-│   │   └── services/      # Socket events & API services
-│   └── public/            # Static assets
+│   │   ├── app/                # Next.js app router pages
+│   │   │   ├── app/           # Team leader routes (/app, /app/inbox, etc.)
+│   │   │   ├── layout.tsx     # Root layout
+│   │   │   └── page.tsx       # Landing page
+│   │   ├── components/         # Reusable UI components
+│   │   ├── stores/            # Zustand state management
+│   │   ├── hooks/             # Custom React hooks
+│   │   ├── services/          # Socket events & API services
+│   │   └── lib/               # Utilities and configurations
+│   └── public/                # Static assets
 │
-└── server/                # Node.js backend application
-    ├── src/
-    │   ├── workers/       # 🤖 Queue assignment workers
-    │   ├── services/      # Core business services
-    │   ├── socketio/      # Real-time event handlers
-    │   ├── db/            # Database schema and connections
-    │   ├── redis/         # Caching layer & queue management
-    │   └── routers/       # API route handlers
-    └── docs/              # Documentation
+├── server/                     # Node.js backend application
+│   ├── src/
+│   │   ├── workers/           # 🤖 Queue assignment workers
+│   │   ├── services/          # Core business services
+│   │   ├── socketio/          # Real-time event handlers
+│   │   ├── db/                # Database schema and connections
+│   │   ├── redis/             # Caching layer & queue management
+│   │   ├── routers/           # API route handlers
+│   │   └── main.ts            # Application entry point
+│   └── docs/                  # Documentation
+│
+└── shared/                     # Shared TypeScript types
+    ├── types.ts               # Common data types
+    └── socket-types.ts        # Socket event types
 ```
 
 ## 📖 Documentation
