@@ -22,6 +22,9 @@ export default function MessagesSection({
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isMessagesEndRefInView, setIsMessagesEndRefInView] = useState(false);
 	const [isNewMessages, setIsNewMessages] = useState(false);
+	const [lastKnownMessageId, setLastKnownMessageId] = useState<string | null>(
+		null
+	);
 
 	const {
 		data: loadedMessages,
@@ -66,9 +69,15 @@ export default function MessagesSection({
 
 	// Set the new messages flag when a new message is added and the messages end ref is not in view
 	useEffect(() => {
-		if (!isMessagesEndRefInView && messages.length > 0) {
+		if (messages.length === 0) return;
+
+		const newestMessageId = messages[0].id;
+
+		if (!isMessagesEndRefInView && lastKnownMessageId !== newestMessageId) {
 			setIsNewMessages(true);
 		}
+
+		setLastKnownMessageId(newestMessageId);
 	}, [messages]);
 
 	// Reset the new messages flag when the messages end ref is in view
@@ -94,7 +103,6 @@ export default function MessagesSection({
 				}
 			})}
 			<EventMessage />
-			{/* FIXME: FIX THIS ON MESSAGES FETCHING  */}
 			{isNewMessages && <NewMessages scrollToBottom={scrollToBottom} />}
 			{hasNextPage && (
 				<div className="flex justify-center items-center mt-2">
