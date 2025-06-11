@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, not, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, not, sql } from "drizzle-orm";
 import { db } from "../db";
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -413,34 +413,67 @@ export const loadConversationById = async (id: string) => {
 };
 
 // load conversation messages by conversation id
-export const loadConversationMessages = async (id: string, take: number, skip: number) => {
+export const loadConversationMessages = async (id: string, take: number, skip: number, targetedMessageId?: string) => {
     try {
-        const messages = await db.query.message.findMany({
-            where: eq(message.conversationId, id),
-            with: {
-                sender: {
-                    columns: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                        role: true,
+        console.log("targetedMessageId", targetedMessageId);
+        let messages = [];
+        const targetedMessage = await db.select().from(message).where(eq(message.id, targetedMessageId ?? "")).limit(1);
+        if (targetedMessageId && targetedMessage.length) {
+            // find the targeted message timestamp by the id
+            const targetTimestamp = targetedMessage[0].createdAt;
+
+            messages = await db.query.message.findMany({
+                where: and(eq(message.conversationId, id), gte(message.createdAt, targetTimestamp)),
+                with: {
+                    sender: {
+                        columns: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                            role: true,
+                        },
                     },
                 },
-            },
-            columns: {
-                content: true,
-                createdAt: true,
-                id: true,
-                conversationId: true,
-                isRead: true,
-                updatedAt: true,
-            },
-            orderBy: [desc(message.createdAt)],
-            limit: take,
-            offset: skip,
+                columns: {
+                    content: true,
+                    createdAt: true,
+                    id: true,
+                    conversationId: true,
+                    isRead: true,
+                    updatedAt: true,
+                },
+                orderBy: [desc(message.createdAt)],
+            });
+        } else {
+            messages = await db.query.message.findMany({
+                where: eq(message.conversationId, id),
+                with: {
+                    sender: {
+                        columns: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                            role: true,
+                        },
+                    },
+                },
+                columns: {
+                    content: true,
+                    createdAt: true,
+                    id: true,
+                    conversationId: true,
+                    isRead: true,
+                    updatedAt: true,
+                },
+                orderBy: [desc(message.createdAt)],
+                limit: take,
+                offset: skip,
 
-        });
+            });
+        }
+
 
         // get total count of messages
         const [documents]: { count: number; }[] = await db.select({

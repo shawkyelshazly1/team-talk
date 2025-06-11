@@ -110,10 +110,10 @@ export const getConversationById = async (req: Request, res: Response) => {
 // get conversation messages by conversation id
 export const getConversationMessages = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { take, skip } = req.query;
+    const { take, skip, targetedMessageId } = req.query;
 
     try {
-        const messages = await conversationRepo.loadConversationMessages(id as string, Number(take) as number, Number(skip) as number);
+        const messages = await conversationRepo.loadConversationMessages(id as string, Number(take) as number, Number(skip) as number, targetedMessageId as string);
 
         res.status(200).json(messages);
     } catch (error) {

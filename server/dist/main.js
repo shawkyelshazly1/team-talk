@@ -9,5 +9,5 @@ const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const PORT = 5000;
 app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
+	console.info(`Server is running on port ${PORT}`);
 });

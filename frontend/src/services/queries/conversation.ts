@@ -117,10 +117,13 @@ export function useLoadConversationById(id: string) {
 }
 
 // load conversation messages by id
-export function useLoadConversationMessagesById(id: string, take: number) {
+export function useLoadConversationMessagesById(id: string, take: number, targetedMessageId?: string) {
     return useInfiniteQuery<{ messages: Message[], total: number; }>({
-        queryKey: ["conversation_messages", id, { take }],
-        queryFn: ({ pageParam = 0 }) => axiosInstance.get(`/conversations/load/conversation/${id}/messages?take=${take}&skip=${pageParam}`).then(res => res.data),
+        queryKey: ["conversation_messages", id, { take, targetedMessageId }],
+        queryFn: ({ pageParam = 0 }) => {
+            const shouldUseTargetedMessage = pageParam === 0 && targetedMessageId;
+            return axiosInstance.get(`/conversations/load/conversation/${id}/messages?take=${take}&skip=${pageParam}${targetedMessageId && shouldUseTargetedMessage ? `&targetedMessageId=${targetedMessageId}` : ""}`).then(res => res.data);
+        },
         initialPageParam: 0,
         getNextPageParam: (lastPage, allPages) => {
             const totalFetched = allPages.reduce((sum, page) => sum + page.messages.length, 0);

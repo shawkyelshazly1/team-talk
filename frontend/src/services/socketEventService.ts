@@ -131,7 +131,6 @@ export const setupSocketEvents = (
 
 	// message events - always update cache, components decide what to show
 	socket.on("new_message", (data) => {
-		console.log("new_message", data);
 		// Get all query cache entries that match the conversation messages pattern
 		const queryCache = queryClient.getQueryCache();
 		const messageCacheEntries = queryCache.findAll({
