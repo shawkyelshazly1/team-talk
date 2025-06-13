@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 import { useLoadConversationById } from "@/services/queries/conversation";
 import { SyncLoader } from "react-spinners";
@@ -10,6 +10,8 @@ import MessageInput from "../common/message_inputs/MessageInput";
 import { useConversationSocket } from "@/hooks/use-conversation-socket";
 import type { User } from "@shared/types";
 import { useUserStore } from "@/stores/useUserStore";
+import { redirect } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function ConversationContainer({
 	conversationId,
@@ -18,6 +20,13 @@ export default function ConversationContainer({
 }) {
 	const { data: conversation, isLoading: isConversationLoading } =
 		useLoadConversationById(conversationId ?? "");
+
+	useEffect(() => {
+		if (!conversation) {
+			toast.error("Conversation not found");
+			redirect("/app");
+		}
+	}, [conversation]);
 
 	const { user } = useUserStore();
 
