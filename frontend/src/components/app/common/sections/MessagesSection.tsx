@@ -138,7 +138,7 @@ export default function MessagesSection({
 	return (
 		<div className="flex-1   overflow-y-auto gap-3 flex-col-reverse flex w-full pt-2 px-2 ">
 			<div ref={messagesEndRef}></div>
-			{messages.map((message) => {
+			{messages.map((message, idx) => {
 				const isTargetedMessage = message.id === targetedMessageRef.current;
 
 				return (
@@ -151,9 +151,18 @@ export default function MessagesSection({
 					`}
 					>
 						{message.sender.id === session?.user?.id ? (
-							<SentMessage key={message.id} message={message} />
+							<SentMessage
+								key={message.id}
+								message={message}
+								nextMessage={messages[idx - 1] ?? null}
+							/>
 						) : (
-							<ReceivedMessage key={message.id} message={message} />
+							<ReceivedMessage
+								key={message.id}
+								message={message}
+								prevMessage={messages[idx + 1] ?? null}
+								nextMessage={messages[idx - 1] ?? null}
+							/>
 						)}
 					</div>
 				);

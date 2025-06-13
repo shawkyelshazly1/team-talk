@@ -23,10 +23,9 @@ export default function InboxConversationsContainer({
 	} = useLoadInfiniteCsrConversations(status, 10);
 
 	return (
-		<div className="flex flex-col gap-2 overflow-y-auto h-full pt-4 px-2">
-			
+		<div className="flex flex-col gap-2 overflow-y-auto max-h-2/5 md:max-h-[85vh] pt-4 px-2">
 			{infiniteStatus === "pending" ? (
-				<div className="flex justify-center items-center h-full">
+				<div className="flex justify-center items-center ">
 					<SyncLoader color="#000" />
 				</div>
 			) : (
@@ -55,7 +54,6 @@ export default function InboxConversationsContainer({
 					</Button>
 				</div>
 			)}
-			
 		</div>
 	);
 }

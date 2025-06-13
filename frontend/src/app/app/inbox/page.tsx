@@ -6,8 +6,8 @@ export default async function InboxPage() {
 	await requireAuth();
 
 	return (
-		<div className="flex min-h-screen px-4">
-			<div className="w-full min-h-screen flex flex-col md:flex-row gap-4">
+		<div className="flex h-screen px-4">
+			<div className="w-full h-full flex flex-col md:flex-row gap-4 justify-between">
 				<InboxConversationsArea />
 				<InboxChatSection />
 			</div>

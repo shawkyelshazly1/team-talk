@@ -30,8 +30,8 @@ export default function InboxConversationsArea() {
 
 	return (
 		<>
-			<div className="py-4 border-r border-border h-full w-full 2xl:w-1/4 xl:w-1/3 lg:w-2/5 md:w-4/8 px-1 justify-between flex flex-col gap-4">
-				<Tabs defaultValue="active_conversations" className=" w-full">
+			<div className="py-4 border-r border-border h-fit max-h-2/5 md:max-h-full md:h-full w-full 2xl:w-1/4 xl:w-1/3 lg:w-2/5 md:w-4/8 px-1 justify-between flex flex-col gap-4">
+				<Tabs defaultValue="active_conversations" className=" w-full h-full">
 					<div className="flex flex-row gap-1 items-center">
 						{isMobile && <CustomSidebarTrigger />}
 						<TabsList className="w-full ">
@@ -69,7 +69,7 @@ export default function InboxConversationsArea() {
 
 				<NewConversationModal />
 			</div>
-			<div className="md:hidden w-full h-[1px] bg-border" />
+			{/* <div className="md:hidden w-full h-[1px] bg-border" /> */}
 		</>
 	);
 }

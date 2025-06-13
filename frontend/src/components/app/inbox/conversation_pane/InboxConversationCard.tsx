@@ -46,7 +46,7 @@ export default function InboxConversationCard({
 						})}
 					</p>
 				</div>
-				<div className="flex flex-row justify-between">
+				<div className="flex flex-row justify-between break-all">
 					<p className="text-sm text-muted-foreground line-clamp-2 ">
 						<span className="font-semibold text-foreground">
 							{session?.user?.id === conversation.lastMessage?.sender.id

@@ -26,7 +26,7 @@ import { columns } from "@/components/app/conversations/conversations_table/colu
 export function ConversationsTable() {
 	const [pagination, setPagination] = useState<PaginationState>({
 		pageIndex: 0, //initial page index
-		pageSize: 10, //default page size
+		pageSize: 12, //default page size
 	});
 
 	const searchParams = useSearchParams();
@@ -92,8 +92,28 @@ export function ConversationsTable() {
 			<SyncLoader color="#000" />
 		</div>
 	) : (
-		<div className="flex flex-col h-[85vh] gap-2">
-			<div className="rounded-md border overflow-y-auto h-[72vh]">
+		<div className="flex flex-col h-full gap-2">
+			<div className="flex items-center justify-end space-x-2 py-4 mt-auto">
+				<Button
+					className="cursor-pointer"
+					variant="outline"
+					size="sm"
+					onClick={() => table.previousPage()}
+					disabled={!table.getCanPreviousPage()}
+				>
+					Previous
+				</Button>
+				<Button
+					className="cursor-pointer"
+					variant="outline"
+					size="sm"
+					onClick={() => table.nextPage()}
+					disabled={!table.getCanNextPage()}
+				>
+					Next
+				</Button>
+			</div>
+			<div className="rounded-md border overflow-y-auto h-full">
 				<Table>
 					<TableHeader className="rounded-t-md overflow-hidden">
 						{table.getHeaderGroups().map((headerGroup) => (
@@ -152,26 +172,6 @@ export function ConversationsTable() {
 						)}
 					</TableBody>
 				</Table>
-			</div>
-			<div className="flex items-center justify-end space-x-2 py-4 mt-auto">
-				<Button
-					className="cursor-pointer"
-					variant="outline"
-					size="sm"
-					onClick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-				>
-					Previous
-				</Button>
-				<Button
-					className="cursor-pointer"
-					variant="outline"
-					size="sm"
-					onClick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-				>
-					Next
-				</Button>
 			</div>
 		</div>
 	);

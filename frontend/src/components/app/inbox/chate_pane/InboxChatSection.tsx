@@ -19,7 +19,7 @@ export default function InboxChatSection() {
 	});
 
 	return conversationId && conversation ? (
-		<div className="py-4 w-full h-full  px-2 gap-2 flex flex-col">
+		<div className="py-4 w-full h-5/9 md:h-full   px-2 gap-2 flex flex-col">
 			<InboxChatHeader conversation={conversation!} />
 			<Suspense fallback={<h1>loading</h1>}>
 				<MessagesSection conversation={conversation!} />
