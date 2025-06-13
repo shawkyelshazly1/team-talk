@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, not, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, lt, not, sql } from "drizzle-orm";
 import { db } from "../db";
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -413,34 +413,100 @@ export const loadConversationById = async (id: string) => {
 };
 
 // load conversation messages by conversation id
-export const loadConversationMessages = async (id: string, take: number, skip: number) => {
+export const loadConversationMessages = async (id: string, take: number, skip: number, targetedMessageId?: string) => {
     try {
-        const messages = await db.query.message.findMany({
-            where: eq(message.conversationId, id),
-            with: {
-                sender: {
-                    columns: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        image: true,
-                        role: true,
+
+        let messages = [];
+
+        const targetedMessage = await db.select().from(message).where(eq(message.id, targetedMessageId ?? "")).limit(1);
+
+        if (targetedMessageId && targetedMessage.length) {
+            // find the targeted message timestamp by the id
+            const targetTimestamp = targetedMessage[0].createdAt;
+
+            const newerMessages = await db.query.message.findMany({
+                where: and(eq(message.conversationId, id), gte(message.createdAt, targetTimestamp)),
+                with: {
+                    sender: {
+                        columns: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                            role: true,
+                        },
                     },
                 },
-            },
-            columns: {
-                content: true,
-                createdAt: true,
-                id: true,
-                conversationId: true,
-                isRead: true,
-                updatedAt: true,
-            },
-            orderBy: [desc(message.createdAt)],
-            limit: take,
-            offset: skip,
+                columns: {
+                    content: true,
+                    createdAt: true,
+                    id: true,
+                    conversationId: true,
+                    isRead: true,
+                    updatedAt: true,
+                },
+                orderBy: [desc(message.createdAt)],
+            });
 
-        });
+            // Load 5 messages older than the target
+            const olderMessages = await db.query.message.findMany({
+                where: and(eq(message.conversationId, id), lt(message.createdAt, targetTimestamp)),
+                with: {
+                    sender: {
+                        columns: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                            role: true,
+                        },
+                    },
+                },
+                columns: {
+                    content: true,
+                    createdAt: true,
+                    id: true,
+                    conversationId: true,
+                    isRead: true,
+                    updatedAt: true,
+                },
+                orderBy: [desc(message.createdAt)],
+                limit: 5, // Load 5 older messages
+            });
+
+            // Combine and sort messages
+            messages = [...newerMessages, ...olderMessages].sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+        } else {
+            messages = await db.query.message.findMany({
+                where: eq(message.conversationId, id),
+                with: {
+                    sender: {
+                        columns: {
+                            id: true,
+                            name: true,
+                            email: true,
+                            image: true,
+                            role: true,
+                        },
+                    },
+                },
+                columns: {
+                    content: true,
+                    createdAt: true,
+                    id: true,
+                    conversationId: true,
+                    isRead: true,
+                    updatedAt: true,
+                },
+                orderBy: [desc(message.createdAt)],
+                limit: take,
+                offset: skip,
+
+            });
+        }
+
 
         // get total count of messages
         const [documents]: { count: number; }[] = await db.select({
@@ -587,6 +653,32 @@ export const loadHistoricalConversations = async (
 };
 
 
+// create new message
+export const createNewMessage = async (content: string, senderId: string, conversationId: string) => {
+    try {
+
+        const newMessage = await db.insert(message).values({
+            id: uuidv4(),
+            conversationId,
+            content,
+            senderId: senderId
+        }).returning();
+
+        const messageWithSender = await db.select({
+            message: message,
+            sender: user
+        })
+            .from(message)
+            .where(eq(message.id, newMessage[0].id))
+            .leftJoin(user, eq(message.senderId, user.id));
+
+        return { ...messageWithSender[0].message, sender: messageWithSender[0].sender as User } satisfies Message;
+    } catch (error) {
+        console.error(error);
+        throw new Error("Failed to create message, please try again later");
+    }
+};
+
 // create conversation by csr
 export const createConversation = async (user: Agent, ticketLink: string, messageContent: string) => {
     try {
@@ -598,12 +690,7 @@ export const createConversation = async (user: Agent, ticketLink: string, messag
         }).returning();
 
         //create new message
-        const newMessage = await db.insert(message).values({
-            id: uuidv4(),
-            conversationId: newConversation[0].id,
-            content: messageContent,
-            senderId: user.id,
-        }).returning();
+        const newMessage = await createNewMessage(messageContent, user.id, newConversation[0].id);
 
         return {
             ...newConversation[0],
@@ -611,14 +698,7 @@ export const createConversation = async (user: Agent, ticketLink: string, messag
                 ...user,
                 role: "csr",
             },
-            lastMessage: {
-                ...newMessage[0],
-                conversationId: newConversation[0].id,
-                sender: {
-                    ...user,
-                    role: "csr",
-                } satisfies Agent,
-            },
+            lastMessage: newMessage,
 
         } satisfies Conversation;
 

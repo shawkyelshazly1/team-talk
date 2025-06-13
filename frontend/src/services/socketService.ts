@@ -34,8 +34,8 @@ export const leaveConversation = (socket: ExtendedSocket, conversationId: string
     socket.emit("leave_conversation", { conversation_id: conversationId });
 };
 
-export const sendMessage = (socket: ExtendedSocket, message: string, conversationId: string) => {
-    socket.emit("new_message", { message, conversation_id: conversationId });
+export const sendMessage = (socket: ExtendedSocket, content: string, conversationId: string, senderId: string, agentId: string) => {
+    socket.emit("new_message", { content, conversation_id: conversationId, sender_id: senderId, agent_id: agentId });
 };
 
 export const disconnectSocket = (socket: ExtendedSocket) => {
@@ -55,5 +55,5 @@ export const startHeartbeat = (socket: ExtendedSocket) => {
         if (socket.connected) {
             sendHeartbeat(socket);
         }
-    }, 5000); // 5 seconds
+    }, 30000); // 30 seconds
 };

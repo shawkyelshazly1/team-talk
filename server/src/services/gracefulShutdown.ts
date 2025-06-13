@@ -45,7 +45,7 @@ export class GracefulShutdownService {
      */
     private async gracefulShutdown(signal: string): Promise<void> {
         if (this.isShuttingDown) {
-            console.log(`Shutdown already in progress with signal: ${signal}`);
+            console.info(`Shutdown already in progress with signal: ${signal}`);
             return;
         }
 

@@ -15,6 +15,7 @@ import { SignOutButton } from "../auth/sign-out-button";
 import { ChevronsUpDown } from "lucide-react";
 import SidebarUserStatus from "./sidebar-userstatus";
 import SidebarStatusSelector from "./sidebar-statusselector";
+import { generateColorFromUsername } from "@/lib/utils";
 export default async function SidebarUserFooter() {
 	const user = await getUser();
 
@@ -35,7 +36,16 @@ export default async function SidebarUserFooter() {
 								<div className="relative ">
 									<Avatar className="h-8 w-8 rounded-lg">
 										<AvatarImage src={user.image ?? ""} alt={user.name} />
-										<AvatarFallback className="rounded-lg uppercase">
+										<AvatarFallback
+											style={{
+												backgroundColor: generateColorFromUsername(
+													user.name ?? ""
+												).backgroundColor,
+												color: generateColorFromUsername(user.name ?? "")
+													.textColor,
+											}}
+											className="rounded-lg uppercase"
+										>
 											{user.name?.charAt(0) + user.name?.charAt(1)}
 										</AvatarFallback>
 									</Avatar>
@@ -59,7 +69,16 @@ export default async function SidebarUserFooter() {
 								<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 									<Avatar className="h-8 w-8 rounded-lg">
 										<AvatarImage src={user.image ?? ""} alt={user.name} />
-										<AvatarFallback className="rounded-lg uppercase">
+										<AvatarFallback
+											className="rounded-lg uppercase"
+											style={{
+												backgroundColor: generateColorFromUsername(
+													user.name ?? ""
+												).backgroundColor,
+												color: generateColorFromUsername(user.name ?? "")
+													.textColor,
+											}}
+										>
 											{user.name?.charAt(0) + user.name?.charAt(1)}
 										</AvatarFallback>
 									</Avatar>

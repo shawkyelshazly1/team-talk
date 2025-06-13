@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 import SelectTopicMenu from "../menus/SelectTopicMenu";
 import type { Conversation } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSetConversationStatus } from "@/services/mutations/conversation";
 import { ClipLoader } from "react-spinners";
 import { useUIStore } from "@/stores/useUIStore";
-import { useParams } from "next/navigation";
+import { useParams, redirect } from "next/navigation";
 import { useLoadConversationById } from "@/services/queries/conversation";
 
 type TopicsModalProps = {
@@ -35,9 +35,14 @@ export default function TopicsModal({
 	const conversationId = params.id as string;
 
 	// Get conversation data from React Query cache
-	const { data: selectedConversation } = useLoadConversationById(
-		selectedConversationId || conversationId
-	);
+	const { data: selectedConversation, isLoading: isConversationLoading } =
+		useLoadConversationById(selectedConversationId || conversationId);
+
+	useEffect(() => {
+		if (!selectedConversation && !isConversationLoading) {
+			redirect("/app");
+		}
+	}, [selectedConversation, isConversationLoading]);
 
 	const queryClient = useQueryClient();
 

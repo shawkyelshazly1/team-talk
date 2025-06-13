@@ -20,7 +20,9 @@ export default function ConversationsSearchResultCard({
 		<div
 			className="flex flex-col w-full gap-4 bg-white rounded-lg hover:bg-gray-200 p-4 cursor-pointer shadow-md"
 			onClick={() => {
-				router.push(`/app/conversation/${conversation.id}`);
+				router.push(
+					`/app/conversation/${conversation.id}?targetedMessage=${conversation.message.id}`
+				);
 			}}
 		>
 			<div className="flex flex-row justify-between">

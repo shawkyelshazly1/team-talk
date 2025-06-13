@@ -4,7 +4,7 @@ import PendingBadge from "../../common/badges/PendingBadge";
 import SolvedBadge from "../../common/badges/SolvedBadge";
 import NewBadge from "../../common/badges/NewBadge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { cn, generateColorFromUsername } from "@/lib/utils";
 import {
 	HoverCard,
 	HoverCardContent,
@@ -31,9 +31,18 @@ export const columns: ColumnDef<Conversation>[] = [
 		cell: ({ row }) => {
 			return (
 				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
-					<Avatar className="w-8 h-8 ring-2 ring-blue-300">
+					<Avatar className="w-8 h-8">
 						<AvatarImage src={row.original.agent.image ?? ""} />
-						<AvatarFallback className="bg-blue-300 text-white uppercase">
+						<AvatarFallback
+							style={{
+								backgroundColor: generateColorFromUsername(
+									row.original.agent.name ?? ""
+								).backgroundColor,
+								color: generateColorFromUsername(row.original.agent.name ?? "")
+									.textColor,
+							}}
+							className="uppercase"
+						>
 							{row.original.agent.name.charAt(0) +
 								row.original.agent.name.charAt(1)}
 						</AvatarFallback>
@@ -49,9 +58,19 @@ export const columns: ColumnDef<Conversation>[] = [
 		cell: ({ row }) => {
 			return row.original.assignee ? (
 				<div className="text-center flex flex-row items-center gap-2 justify-center mx-auto">
-					<Avatar className="w-8 h-8 ring-2 ring-blue-300">
+					<Avatar className="w-8 h-8 ">
 						<AvatarImage src={row.original.assignee?.image ?? ""} />
-						<AvatarFallback className="bg-blue-300 text-white uppercase">
+						<AvatarFallback
+							style={{
+								backgroundColor: generateColorFromUsername(
+									row.original.assignee?.name ?? ""
+								).backgroundColor,
+								color: generateColorFromUsername(
+									row.original.assignee?.name ?? ""
+								).textColor,
+							}}
+							className="uppercase"
+						>
 							{row.original.assignee?.name?.charAt(0) +
 								row.original.assignee?.name?.charAt(1)}
 						</AvatarFallback>
@@ -84,7 +103,16 @@ export const columns: ColumnDef<Conversation>[] = [
 										)}
 									>
 										<AvatarImage src={tl?.image ?? ""} />
-										<AvatarFallback className="bg-blue-500 text-white uppercase">
+										<AvatarFallback
+											style={{
+												backgroundColor: generateColorFromUsername(
+													tl?.name ?? ""
+												).backgroundColor,
+												color: generateColorFromUsername(tl?.name ?? "")
+													.textColor,
+											}}
+											className="uppercase"
+										>
 											{tl.name.charAt(0) + tl.name.charAt(1)}
 										</AvatarFallback>
 									</Avatar>
@@ -103,7 +131,15 @@ export const columns: ColumnDef<Conversation>[] = [
 									)}
 								>
 									<AvatarImage src={tl?.image ?? ""} />
-									<AvatarFallback className="bg-blue-300 text-white uppercase">
+									<AvatarFallback
+										style={{
+											backgroundColor: generateColorFromUsername(tl?.name ?? "")
+												.backgroundColor,
+											color: generateColorFromUsername(tl?.name ?? "")
+												.textColor,
+										}}
+										className="uppercase"
+									>
 										{tl.name.charAt(0) + tl.name.charAt(1)}
 									</AvatarFallback>
 								</Avatar>
@@ -115,7 +151,15 @@ export const columns: ColumnDef<Conversation>[] = [
 							<div key={tl.id} className="flex flex-row items-center gap-2">
 								<Avatar>
 									<AvatarImage src={tl?.image ?? ""} />
-									<AvatarFallback className="bg-blue-300 text-white uppercase">
+									<AvatarFallback
+										style={{
+											backgroundColor: generateColorFromUsername(tl?.name ?? "")
+												.backgroundColor,
+											color: generateColorFromUsername(tl?.name ?? "")
+												.textColor,
+										}}
+										className="uppercase"
+									>
 										{tl.name.charAt(0) + tl.name.charAt(1)}
 									</AvatarFallback>
 								</Avatar>

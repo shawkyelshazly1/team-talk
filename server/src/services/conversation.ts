@@ -1,4 +1,4 @@
-import type { Agent, Conversation } from "@shared/types";
+import type { Agent, Conversation, Message } from "@shared/types";
 import { meilisearchMutations } from "../meilisearch";
 import { conversationRepo } from "../repos";
 import { redisUtils } from "../redis";
@@ -10,7 +10,7 @@ export const createNewConversation = async (
     user: Agent,
     ticketLink: string,
     message: string
-) => {
+): Promise<Conversation> => {
     try {
         // create conversation in DB
         const conversation = await conversationRepo.createConversation(
@@ -43,7 +43,7 @@ export const changeConversationStatus = async (
     status: Conversation["status"],
     topic: string,
     user: Agent
-) => {
+): Promise<Omit<Conversation, "agent">> => {
     try {
         const conversation = await conversationRepo.setConversationStatus(
             conversationId,
@@ -117,7 +117,7 @@ export const assignConversationToTeamleader = async (assignment: {
 };
 
 // unassign conversation from teamleader service
-export const clearTeamleaderBasket = async (teamleaderId: string) => {
+export const clearTeamleaderBasket = async (teamleaderId: string): Promise<boolean> => {
     try {
         // get conversations from teamleader basket
         const conversations = await redisUtils.getTeamleaderBasket(teamleaderId);
@@ -143,6 +143,23 @@ export const clearTeamleaderBasket = async (teamleaderId: string) => {
 
         return true;
     } catch (error) {
+        throw error;
+    }
+};
+
+// create new message service
+export const createNewMessage = async (content: string, senderId: string, conversationId: string): Promise<Message> => {
+    try {
+        // create message in DB
+        const newMessage = await conversationRepo.createNewMessage(content, senderId, conversationId);
+
+        // add message to meilisearch
+        await meilisearchMutations.addMessageToMeilisearch(newMessage);
+
+        return newMessage;
+
+    } catch (error) {
+        console.error(`Failed to create new message in conversation ${conversationId}`, error);
         throw error;
     }
 };

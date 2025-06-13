@@ -20,7 +20,7 @@ async function startQueueWorker() {
 
         //  graceful shutdown
         const shutdown = async (signal: string) => {
-            console.log(`\n Received ${signal}, shutting down gracefully...`);
+            console.info(`\n Received ${signal}, shutting down gracefully...`);
 
             // Stop worker first
             worker.stop();

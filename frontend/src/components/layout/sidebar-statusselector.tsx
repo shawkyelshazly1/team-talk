@@ -70,7 +70,6 @@ export default function SidebarStatusSelector() {
 			<DropdownMenuItem
 				onClick={() => {
 					handleSetStatus("offline");
-					// FIXME: unassign conversations on server side
 					clearBasket();
 					setSelectedConversationId("");
 					// remove all params from the url

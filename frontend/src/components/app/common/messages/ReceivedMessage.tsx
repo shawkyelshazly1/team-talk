@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateColorFromUsername } from "@/lib/utils";
 import type { Message } from "@shared/types";
 
 export default function ReceivedMessage({ message }: { message: Message }) {
@@ -10,7 +11,16 @@ export default function ReceivedMessage({ message }: { message: Message }) {
 					src={message.sender.image ?? ""}
 					alt="User avatar"
 				/>
-				<AvatarFallback className="uppercase">
+				<AvatarFallback
+					style={{
+						backgroundColor: generateColorFromUsername(
+							message.sender.name ?? ""
+						).backgroundColor,
+						color: generateColorFromUsername(message.sender.name ?? "")
+							.textColor,
+					}}
+					className="uppercase"
+				>
 					{message.sender.name?.charAt(0) + message.sender.name?.charAt(1)}
 				</AvatarFallback>
 			</Avatar>

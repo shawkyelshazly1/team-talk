@@ -17,11 +17,23 @@ export default function MessagesSection({
 	conversation: Conversation;
 }) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const targetedMessageRef = useRef<string | null>(null);
 	const { data: session } = useSession();
 
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isMessagesEndRefInView, setIsMessagesEndRefInView] = useState(false);
 	const [isNewMessages, setIsNewMessages] = useState(false);
+	const [lastKnownMessageId, setLastKnownMessageId] = useState<string | null>(
+		null
+	);
+	const [hasScrolledToTarget, setHasScrolledToTarget] = useState(false);
+	const [showHighlight, setShowHighlight] = useState(true);
+
+	// Initialize the ref once
+	if (!targetedMessageRef.current && typeof window !== "undefined") {
+		const urlParams = new URLSearchParams(window.location.search);
+		targetedMessageRef.current = urlParams.get("targetedMessage");
+	}
 
 	const {
 		data: loadedMessages,
@@ -29,13 +41,39 @@ export default function MessagesSection({
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-	} = useLoadConversationMessagesById(conversation?.id ?? "", 10);
+	} = useLoadConversationMessagesById(
+		conversation?.id ?? "",
+		10,
+		targetedMessageRef.current ?? ""
+	);
 
 	useEffect(() => {
 		if (loadedMessages) {
 			setMessages(loadedMessages.pages.flatMap((page) => page.messages));
+
+			// Scroll to targeted message after first load
+			if (targetedMessageRef.current && !hasScrolledToTarget) {
+				// Small delay to ensure DOM is updated
+				setTimeout(() => {
+					const targetElement = document.getElementById(
+						`message-${targetedMessageRef.current}`
+					);
+					if (targetElement) {
+						targetElement.scrollIntoView({
+							behavior: "smooth",
+							block: "center", // Centers the message in view
+						});
+						setHasScrolledToTarget(true);
+
+						// Remove highlight after 4 seconds
+						setTimeout(() => {
+							setShowHighlight(false);
+						}, 1000);
+					}
+				}, 100);
+			}
 		}
-	}, [loadedMessages]);
+	}, [loadedMessages, hasScrolledToTarget]);
 
 	// Set the messages end ref observer
 	useEffect(() => {
@@ -59,16 +97,30 @@ export default function MessagesSection({
 
 	// Keep scrolling to bottom when the messages end ref is in view
 	function keepScrollToBottom() {
-		if (messagesEndRef.current && isMessagesEndRefInView) {
+		if (
+			messagesEndRef.current &&
+			isMessagesEndRefInView &&
+			!hasScrolledToTarget
+		) {
 			messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 		}
 	}
 
 	// Set the new messages flag when a new message is added and the messages end ref is not in view
 	useEffect(() => {
-		if (!isMessagesEndRefInView && messages.length > 0) {
+		if (messages.length === 0) return;
+
+		const newestMessage = messages[0];
+
+		if (
+			!isMessagesEndRefInView &&
+			lastKnownMessageId !== newestMessage.id &&
+			newestMessage.sender.id !== session?.user?.id
+		) {
 			setIsNewMessages(true);
 		}
+
+		setLastKnownMessageId(newestMessage.id);
 	}, [messages]);
 
 	// Reset the new messages flag when the messages end ref is in view
@@ -87,20 +139,35 @@ export default function MessagesSection({
 		<div className="flex-1   overflow-y-auto gap-3 flex-col-reverse flex w-full pt-2 px-2 ">
 			<div ref={messagesEndRef}></div>
 			{messages.map((message) => {
-				if (message.sender.id === session?.user?.id) {
-					return <SentMessage key={message.id} message={message} />;
-				} else {
-					return <ReceivedMessage key={message.id} message={message} />;
-				}
+				const isTargetedMessage = message.id === targetedMessageRef.current;
+
+				return (
+					<div
+						key={message.id}
+						id={isTargetedMessage ? `message-${message.id}` : undefined}
+						className={`
+						${isTargetedMessage ? "transition-all duration-500 ease-in-out rounded-lg" : ""}
+						${isTargetedMessage && showHighlight ? "bg-yellow-100" : ""}
+					`}
+					>
+						{message.sender.id === session?.user?.id ? (
+							<SentMessage key={message.id} message={message} />
+						) : (
+							<ReceivedMessage key={message.id} message={message} />
+						)}
+					</div>
+				);
 			})}
 			<EventMessage />
-			{/* FIXME: FIX THIS ON MESSAGES FETCHING  */}
 			{isNewMessages && <NewMessages scrollToBottom={scrollToBottom} />}
 			{hasNextPage && (
 				<div className="flex justify-center items-center mt-2">
 					<Button
 						className="cursor-pointer w-[8rem]"
-						onClick={() => fetchNextPage()}
+						onClick={() => {
+							targetedMessageRef.current = "";
+							fetchNextPage();
+						}}
 						disabled={isFetchingNextPage}
 					>
 						{isFetchingNextPage ? (

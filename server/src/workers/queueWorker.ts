@@ -36,7 +36,7 @@ class QueueWorker {
 
     async start(): Promise<void> {
         if (this.isRunning) {
-            console.log("Queue worker is already running");
+            console.info("Queue worker is already running");
             return;
         }
 
@@ -142,7 +142,7 @@ class QueueWorker {
 
                 // Rollback Redis changes since database/socket failed
                 await this.rollbackAssignment(assignment);
-                // TODO: Add to retry queue or dead letter queue
+
             }
         }
 

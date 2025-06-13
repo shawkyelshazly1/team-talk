@@ -26,3 +26,7 @@ export const deleteMessagesFromMeilisearch = async (messageIds: string[]) => {
 };
 
 // delete all messages from meilisearch
+export const deleteAllMessagesFromMeilisearch = async () => {
+    const result = await meilisearch.index("messages").deleteAllDocuments().waitTask();
+    return result;
+};

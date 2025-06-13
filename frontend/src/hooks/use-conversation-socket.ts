@@ -15,9 +15,9 @@ export const useConversationSocket = ({ conversationId }: ConversationSocketProp
     // Room joining/leaving is now handled by useConversationRooms
     // This hook only handles message sending
 
-    const handleSendMessage = useCallback((message: string) => {
+    const handleSendMessage = useCallback((content: string, senderId: string, agentId: string) => {
         if (socket && conversationId) {
-            sendMessage(socket, message, conversationId);
+            sendMessage(socket, content, conversationId, senderId, agentId);
         }
     }, [socket, conversationId]);
 
