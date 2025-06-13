@@ -7,7 +7,7 @@ export default async function InboxPage() {
 
 	return (
 		<div className="flex min-h-screen px-4">
-			<div className="w-full min-h-screen flex-1 flex flex-row">
+			<div className="w-full min-h-screen flex flex-col md:flex-row gap-4">
 				<InboxConversationsArea />
 				<InboxChatSection />
 			</div>

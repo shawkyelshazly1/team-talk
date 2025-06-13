@@ -14,7 +14,7 @@ export default function ChatHeader({
 	const { data: session } = useSession();
 
 	return (
-		<div className="flex flex-row items-center justify-between border-b border-border pb-4">
+		<div className="flex flex-row items-center justify-between border-b border-border pb-4 w-full">
 			<div className="flex flex-row gap-2 w-full">
 				{conversation.agent.id === session?.user?.id ? null : (
 					<AgentInfoAvatar conversation={conversation} />

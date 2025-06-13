@@ -19,7 +19,7 @@ export default function InboxChatSection() {
 	});
 
 	return conversationId && conversation ? (
-		<div className="  h-[100vh] py-4 w-1/2 lg:w-2/3 px-2 gap-2 flex flex-col">
+		<div className="py-4 w-full h-full  px-2 gap-2 flex flex-col">
 			<InboxChatHeader conversation={conversation!} />
 			<Suspense fallback={<h1>loading</h1>}>
 				<MessagesSection conversation={conversation!} />
@@ -35,7 +35,7 @@ export default function InboxChatSection() {
 			</p>
 		</div>
 	) : (
-		<div className="  h-[100vh] py-4 w-1/2 lg:w-2/3 px-2 gap-2 flex flex-col">
+		<div className="py-4 w-full h-full px-2 gap-2 flex flex-col">
 			<div className="flex justify-center items-center h-full">
 				<p className="text-muted-foreground">No conversation selected</p>
 			</div>

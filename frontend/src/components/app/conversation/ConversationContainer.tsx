@@ -12,12 +12,15 @@ import type { User } from "@shared/types";
 import { useUserStore } from "@/stores/useUserStore";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
+import CustomSidebarTrigger from "@/components/layout/CustomSidebarTrigger";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export default function ConversationContainer({
 	conversationId,
 }: {
 	conversationId: string;
 }) {
+	const { isMobile } = useSidebar();
 	const { data: conversation, isLoading: isConversationLoading } =
 		useLoadConversationById(conversationId ?? "");
 
@@ -45,7 +48,10 @@ export default function ConversationContainer({
 		</div>
 	) : (
 		<>
-			<ChatHeader conversation={conversation!} />
+			<div className="flex flex-row gap-2 items-center  w-full">
+				{isMobile && <CustomSidebarTrigger />}
+				<ChatHeader conversation={conversation!} />
+			</div>
 			<Suspense fallback={<h1>loading</h1>}>
 				<MessagesSection conversation={conversation!} />
 			</Suspense>

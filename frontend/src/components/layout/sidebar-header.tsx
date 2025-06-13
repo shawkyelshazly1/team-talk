@@ -10,6 +10,7 @@ import {
 	SidebarTrigger,
 } from "../ui/sidebar";
 import { cn } from "@/lib/utils";
+import CustomSidebarTrigger from "./CustomSidebarTrigger";
 
 export default function SideBarLogo() {
 	const { state } = useSidebar();
@@ -29,7 +30,12 @@ export default function SideBarLogo() {
 		}
 	}, [state]);
 	return (
-		<SidebarHeader className="flex items-center justify-center">
+		<SidebarHeader
+			className={cn(
+				"flex items-center justify-center flex-row",
+				state === "collapsed" && "flex-col"
+			)}
+		>
 			<SidebarMenu>
 				<SidebarMenuItem
 					className={cn(
@@ -48,9 +54,9 @@ export default function SideBarLogo() {
 							</h2>
 						</div>
 					</SidebarMenuButton>
-					<SidebarTrigger className=" cursor-pointer" />
 				</SidebarMenuItem>
 			</SidebarMenu>
+			<CustomSidebarTrigger />
 		</SidebarHeader>
 	);
 }
