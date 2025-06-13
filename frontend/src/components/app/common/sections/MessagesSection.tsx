@@ -97,7 +97,11 @@ export default function MessagesSection({
 
 	// Keep scrolling to bottom when the messages end ref is in view
 	function keepScrollToBottom() {
-		if (messagesEndRef.current && isMessagesEndRefInView) {
+		if (
+			messagesEndRef.current &&
+			isMessagesEndRefInView &&
+			!hasScrolledToTarget
+		) {
 			messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
 		}
 	}
@@ -106,13 +110,17 @@ export default function MessagesSection({
 	useEffect(() => {
 		if (messages.length === 0) return;
 
-		const newestMessageId = messages[0].id;
+		const newestMessage = messages[0];
 
-		if (!isMessagesEndRefInView && lastKnownMessageId !== newestMessageId) {
+		if (
+			!isMessagesEndRefInView &&
+			lastKnownMessageId !== newestMessage.id &&
+			newestMessage.sender.id !== session?.user?.id
+		) {
 			setIsNewMessages(true);
 		}
 
-		setLastKnownMessageId(newestMessageId);
+		setLastKnownMessageId(newestMessage.id);
 	}, [messages]);
 
 	// Reset the new messages flag when the messages end ref is in view

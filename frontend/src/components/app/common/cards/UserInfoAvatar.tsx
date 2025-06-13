@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateColorFromUsername } from "@/lib/utils";
 import type { User } from "@shared/types";
 
 export default function UserInfoAvatar({ user }: { user: User }) {
@@ -6,7 +7,14 @@ export default function UserInfoAvatar({ user }: { user: User }) {
 		<div className="flex items-center gap-2">
 			<Avatar>
 				<AvatarImage src={user?.image ?? ""} />
-				<AvatarFallback className="uppercase">
+				<AvatarFallback
+					className="uppercase"
+					style={{
+						backgroundColor: generateColorFromUsername(user?.name ?? "")
+							.backgroundColor,
+						color: generateColorFromUsername(user?.name ?? "").textColor,
+					}}
+				>
 					{user?.name?.charAt(0) + user?.name?.charAt(1)}
 				</AvatarFallback>
 			</Avatar>

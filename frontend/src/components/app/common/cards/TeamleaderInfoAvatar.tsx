@@ -1,5 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateColorFromUsername } from "@/lib/utils";
 import type { TeamLeader } from "@shared/types";
 
 export default function TeamleaderInfoAvatar({
@@ -12,7 +13,14 @@ export default function TeamleaderInfoAvatar({
 			<div className="flex items-center gap-2">
 				<Avatar>
 					<AvatarImage src={teamleader.image ?? ""} />
-					<AvatarFallback className="uppercase">
+					<AvatarFallback
+						className="uppercase"
+						style={{
+							backgroundColor: generateColorFromUsername(teamleader.name ?? "")
+								.backgroundColor,
+							color: generateColorFromUsername(teamleader.name ?? "").textColor,
+						}}
+					>
 						{teamleader.name?.charAt(0) + teamleader.name?.charAt(1)}
 					</AvatarFallback>
 				</Avatar>

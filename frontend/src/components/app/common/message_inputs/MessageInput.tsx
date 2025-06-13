@@ -23,6 +23,18 @@ export default function MessageInput({
 		<div className="border-2 border-border rounded-lg  max-h-[100px]  flex flex-row justify-between">
 			<Textarea
 				value={messageContent}
+				// use shift + enter to add a new line && enter to send message
+				onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+					if (e.key === "Enter" && !e.shiftKey) {
+						e.preventDefault();
+						sendMessage(
+							messageContent.trim(),
+							user?.id!,
+							conversation.agent.id
+						);
+						setMessageContent("");
+					}
+				}}
 				disabled={conversation?.status === "closed"}
 				onChange={(e) => setMessageContent(e.target.value)}
 				className="resize-none focus-visible:outline-none w-full  p-2  break-words  overflow-y-auto focus-visible:ring-0 focus-visible:border-0 border-0 outline-0 ring-0 ring-offset-0 shadow-none"

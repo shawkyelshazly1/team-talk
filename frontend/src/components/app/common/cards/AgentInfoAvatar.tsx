@@ -1,5 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateColorFromUsername } from "@/lib/utils";
 import type { Conversation } from "@shared/types";
 
 export default function AgentInfoAvatar({
@@ -12,7 +13,17 @@ export default function AgentInfoAvatar({
 			<div className="flex items-center gap-2">
 				<Avatar>
 					<AvatarImage src={conversation?.agent?.image ?? ""} />
-					<AvatarFallback className="uppercase">
+					<AvatarFallback
+						style={{
+							backgroundColor: generateColorFromUsername(
+								conversation?.agent?.name ?? "Agent"
+							).backgroundColor,
+							color: generateColorFromUsername(
+								conversation?.agent?.name ?? "Agent"
+							).textColor,
+						}}
+						className="uppercase"
+					>
 						{conversation?.agent?.name?.charAt(0) +
 							conversation?.agent?.name?.charAt(1)}
 					</AvatarFallback>
