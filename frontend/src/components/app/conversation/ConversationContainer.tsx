@@ -22,11 +22,11 @@ export default function ConversationContainer({
 		useLoadConversationById(conversationId ?? "");
 
 	useEffect(() => {
-		if (!conversation) {
+		if (!conversation && !isConversationLoading) {
 			toast.error("Conversation not found");
 			redirect("/app");
 		}
-	}, [conversation]);
+	}, [conversation, isConversationLoading]);
 
 	const { user } = useUserStore();
 
@@ -38,6 +38,10 @@ export default function ConversationContainer({
 	return isConversationLoading ? (
 		<div className="flex justify-center items-center h-full">
 			<SyncLoader size={10} color="#000" />
+		</div>
+	) : !conversation ? (
+		<div className="flex justify-center items-center h-full">
+			<h1>Conversation not found</h1>
 		</div>
 	) : (
 		<>

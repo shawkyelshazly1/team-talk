@@ -192,6 +192,11 @@ export const setupSocketEvents = (
 		}
 	});
 
+	// error events
+	socket.on("error", (data) => {
+		toast.error(data.message || "Something went wrong");
+	});
+
 	// sync basket events
 	socket.on("sync_basket", (data) => {
 		const { basket: serverBasket } = data;

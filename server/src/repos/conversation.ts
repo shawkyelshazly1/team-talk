@@ -675,7 +675,7 @@ export const createNewMessage = async (content: string, senderId: string, conver
         return { ...messageWithSender[0].message, sender: messageWithSender[0].sender as User } satisfies Message;
     } catch (error) {
         console.error(error);
-        throw error;
+        throw new Error("Failed to create message, please try again later");
     }
 };
 

@@ -22,6 +22,7 @@ export interface ServerToClientEvents {
     current_status: (data: { status: UserStatus; }) => void;
     heartbeat_ack: (data: { timestamp: number; success: boolean; message?: string; }) => void;
     sync_basket: (data: { basket: string[]; }) => void;
+    error: (data: { message: string; }) => void;
 }
 
 

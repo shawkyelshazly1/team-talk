@@ -35,15 +35,14 @@ export default function TopicsModal({
 	const conversationId = params.id as string;
 
 	// Get conversation data from React Query cache
-	const { data: selectedConversation } = useLoadConversationById(
-		selectedConversationId || conversationId
-	);
+	const { data: selectedConversation, isLoading: isConversationLoading } =
+		useLoadConversationById(selectedConversationId || conversationId);
 
 	useEffect(() => {
-		if (!selectedConversation) {
+		if (!selectedConversation && !isConversationLoading) {
 			redirect("/app");
 		}
-	}, [selectedConversation]);
+	}, [selectedConversation, isConversationLoading]);
 
 	const queryClient = useQueryClient();
 

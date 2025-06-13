@@ -15,30 +15,41 @@ export const registerConversationListeners = (socket: ExtendedSocket) => {
 
     socket.on("new_message", async (data) => {
 
-        // create new message
-        const newMessage = await conversationServices.createNewMessage(data.content, data.sender_id, data.conversation_id);
+        try {
+            // create new message
+            const newMessage = await conversationServices.createNewMessage(data.content, data.sender_id, data.conversation_id);
 
-        const { socketIOClient } = await import("../index");
+            const { socketIOClient } = await import("../index");
 
-        socketIOClient.to(data.conversation_id).emit("new_message", {
-            message: newMessage,
-            conversationId: data.conversation_id,
-        });
-
-        if (socket.data.user?.role === "csr") {
-            socketIOClient.to(`user_${data.agent_id}`).emit("new_message", {
+            socketIOClient.to(data.conversation_id).emit("new_message", {
                 message: newMessage,
                 conversationId: data.conversation_id,
             });
-        }
 
-        if (data.sender_id !== data.agent_id) {
-            // send message to agent room
-            socket.to(`user_${data.agent_id}`).emit("new_message", {
-                message: newMessage,
-                conversationId: data.conversation_id,
+            if (socket.data.user?.role === "csr") {
+                socketIOClient.to(`user_${data.agent_id}`).emit("new_message", {
+                    message: newMessage,
+                    conversationId: data.conversation_id,
+                });
+            }
+
+            if (data.sender_id !== data.agent_id) {
+                // send message to agent room
+                socket.to(`user_${data.agent_id}`).emit("new_message", {
+                    message: newMessage,
+                    conversationId: data.conversation_id,
+                });
+            }
+            return;
+        } catch (error) {
+            console.error(error);
+            socket.emit("error", {
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : "Something went wrong",
             });
+            return;
         }
-        return;
     });
 };
